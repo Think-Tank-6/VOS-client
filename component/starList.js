@@ -21,7 +21,7 @@ function StarList({ navigation }) {
         };
 
         fetchStars();
-    })
+    }, []);
 
     return (
       <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper}>
