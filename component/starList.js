@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import Generate from './generate'; 
 
 function StarList({ navigation }) {
-    const onAddPress = () => {
-      navigation.navigate('Generate');
-    };
-
     const [stars, setStars] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false); // Modal의 표시 상태를 관리하는 상태 변수를 추가합니다.
+
 
     useEffect(() => {
         const fetchStars = async () => {
             try {
-                let response = await fetch('http://localhost:8000/stars');
+                let response = await fetch('http://172.18.0.2:8000/stars'); // ip주소 확인 후 변경
                 let json = await response.json();
                 setStars(json.stars);
               } catch (error) {
@@ -21,24 +20,37 @@ function StarList({ navigation }) {
         };
 
         fetchStars();
-    }, []);
+    }, [])
+
+    const handleOpenModal = () => {
+        setModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalVisible(false);
+    };
 
     return (
       <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper}>
         <StatusBar style='light' />
         <View style={styles.logo}>
-          <Image source={require('../assets/img/title.png')} style={styles.topImage}/>
+            <Image source={require('../assets/img/title.png')} style={styles.topImage}/>
         </View>
-
-        {/* '+' 버튼과 '채팅을 추가하세요' 텍스트 */}
-        <TouchableOpacity 
-            style={styles.addButtonContainer} 
-            onPress={onAddPress}
-        >
+        <TouchableOpacity style={styles.addButtonContainer} onPress={handleOpenModal}>
             <Text style={styles.plus}>+</Text>
-            <Text style={styles.addText}>채팅을 추가하세요</Text> 
+            <Text style={styles.addText}>채팅을 추가하세요</Text>
         </TouchableOpacity>
-
+        {/* 팝업으로 사용될 Modal 컴포넌트를 추가합니다. */}
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={handleCloseModal}
+        >
+            <View style={styles.centeredModalView}>
+                <Generate closeModal={handleCloseModal} />
+            </View>
+        </Modal>
         {/* 설정 버튼 - 이 부분은 현재 사용되지 않음 */}
         {/* 추후 필요에 따라 onSettingsPress 함수 추가 및 연결 가능 */}
       </ImageBackground>
@@ -100,7 +112,24 @@ const styles = StyleSheet.create({
         resizeMode: 'contain', // 이미지 비율을 유지하면서 적절히 맞도록 설정
         alignSelf: 'center', // 컴포넌트를 가로축에서 중앙에 배치
     },
-
+    centeredModalView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    // `Generate` 컴포넌트의 스타일을 여기에 추가할 수 있습니다.
+    generateContainer: {
+        width: '80%', // 모달의 너비
+        backgroundColor: 'white',
+        padding: 20,
+        shadowColor: '#000',
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     
 });
 
