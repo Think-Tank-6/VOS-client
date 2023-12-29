@@ -6,26 +6,27 @@ function Login({ navigation }) {
     const [password, setPassword] = useState('');
 
     const onLoginPress = async () => {
-        const formBody = new URLSearchParams();
-        formBody.append('username', user_id);
-        formBody.append('password', password);
-
+        const loginData ={
+            user_id:user_id,
+            password:password,
+        };
         try {
-            let response = await fetch('http://192.168.0.96:8000/login', {
+            let response = await fetch('http://192.168.0.96:8000/auth/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                 },
-                body: formBody.toString(),
+                body: JSON.stringify(loginData),
             });
 
-            let jsonResponse = await response.json();
-            if (jsonResponse.success) {
-                // 로그인 성공 시 'List'로 이동
-                navigation.navigate('List');
+            if (response.ok) {
+                // 로그인 성공 시 처리
+                let jsonResponse = await response.json();
+                // jsonResponse에 담긴 데이터로 로직 처리
+                navigation.navigate('StarList');
             } else {
-                // 로그인 실패 시 콘솔에 메시지 출력
-                console.log('Login failed:', jsonResponse.message);
+                // 로그인 실패 시 처리
+                console.log('Login failed:', response.statusText);
             }
         } catch (error) {
             // 네트워크 오류 처리
@@ -36,7 +37,7 @@ function Login({ navigation }) {
         navigation.navigate('Join');
       };
     const onAddPress = () => {
-        navigation.navigate('List');
+        navigation.navigate('StarList');
       };  
 
     return (
