@@ -11,7 +11,7 @@ function StarList({ navigation }) {
     useEffect(() => {
         const fetchStars = async () => {
             try {
-                let response = await fetch('http://172.18.0.2:8000/stars');
+                let response = await fetch('http://172.18.0.2:8000/stars'); // ip주소 확인 후 변경
                 let json = await response.json();
                 setStars(json.stars);
               } catch (error) {
