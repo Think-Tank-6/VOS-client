@@ -1,9 +1,9 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Main from './components/main';
-import Login from './components/login';
-import Join from './components/join';
+import Main from './component/main';
+import Login from './component/login';
+import Join from './component/join';
 
 const Stack = createNativeStackNavigator();
 
