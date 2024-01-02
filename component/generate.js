@@ -66,34 +66,42 @@ const Generate = ({ closeModal }) => {
   let response;
 
   const handleSubmit = async () => {
-    setLoading(true);  
+    setLoading(true);
+
+    // FormData 객체 생성
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('birthDate', birthDate.toISOString());
+    formData.append('deceaseDate', deceaseDate.toISOString());
+    formData.append('relationship', relationship);
+    formData.append('feature', feature);
+
+    // 파일이 선택되었는지 확인하고 FormData에 추가
+    if (selectedTextFile) {
+        formData.append('textFile', selectedTextFile);
+    }
+    if (selectedAudioFile) {
+        formData.append('audioFile', selectedAudioFile);
+    }
 
     try {
-      response = await fetch('http://172.18.0.2:8000/submit-data', { //컴퓨터 ipconfig 로 검색해서 컴퓨터 ip주소 넣어야함
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          birthDate,
-          deceaseDate,
-          relationship,
-          feature,
-        }),
-      });
+        const response = await fetch('http://172.18.0.2:8000/stars', {  // ip 주소 설정필요
+            method: 'POST',
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                // 'Authorization': `Bearer ${yourAuthToken}`, // 인증 토큰이 필요한 경우
+            },
+            body: formData,
+        });
 
-      const jsonResponse = await response.json();
+        const jsonResponse = await response.json();
 
-      // 서버 응답 처리
-      console.log(jsonResponse);
+        // 서버 응답 처리
+        console.log(jsonResponse);
     } catch (error) {
-      console.error('Error submitting data:', error);
-      console.error('Error details:', error.message); // 에러 메시지
-
-      // 수정된 부분: response가 정의되지 않은 경우에도 에러 핸들링 가능
-      const status = response?.status || 'unknown';
-      console.error('Response status:', status); // 서버 응답 상태 코드
+        console.error('Error submitting data:', error);
+    } finally {
+        setLoading(false);
     }
   };
 
