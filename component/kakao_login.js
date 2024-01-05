@@ -2,16 +2,12 @@ import React from 'react';
 import { View } from "react-native";
 import { WebView } from 'react-native-webview';
 import axios from 'axios';
-import Constants from 'expo-constants';
-
-
-// 카카오 로그인을 위한 클라이언트 ID 및 리다이렉트 URI 설정
-
-const { kakaoClientId, kakaoRedirectUri } = Constants.manifest.extra;
-
+import { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } from '@env';
 
 const KakaoLogin = ({ navigation }) => {
     // 웹뷰에서 로그인 진행 상황을 추적하는 함수
+    console.log('카카오클라',KAKAO_CLIENT_ID);
+    console.log('URI',KAKAO_REDIRECT_URI);
     const handleWebViewNavigationStateChange = (newNavState) => {
         const { url } = newNavState;
         if (!url) return;
@@ -27,6 +23,7 @@ const KakaoLogin = ({ navigation }) => {
     // 카카오 토큰 요청 함수
     const requestToken = async (code) => {
         try {
+            
             const response = await axios.post("https://kauth.kakao.com/oauth/token", null, {
                 params: {
                     grant_type: 'authorization_code',
@@ -37,7 +34,7 @@ const KakaoLogin = ({ navigation }) => {
             });
 
             const accessToken = response.data.access_token;
-            sendTokenToServer(accessToken);0
+            sendTokenToServer(accessToken);
         } catch (error) {
             console.error('Error requesting token:', error);
         }
@@ -45,7 +42,7 @@ const KakaoLogin = ({ navigation }) => {
 
     // 서버로 토큰 전송
     const sendTokenToServer = async (accessToken) => {
-        console.log('Sending Token to Server:', accessToken); // 서버로 전송되는 토큰 확인
+        console.log('Sending Token to Server:', accessToken);
 
         try {
             let response = await fetch('http://192.168.0.96:8000/users/kakao-login', {
@@ -58,9 +55,8 @@ const KakaoLogin = ({ navigation }) => {
     
             if (response.ok) {
                 let jsonResponse = await response.json();
-                console.log('Server Response:', jsonResponse);  // 서버 응답 확인
+                console.log('Server Response:', jsonResponse);
                 console.log('Login Success:', jsonResponse);
-                // 로그인 성공 후 StarList 화면으로 이동
                 navigation.navigate('StarList');
             } else {
                 console.error('Login Failed:', response.statusText);
@@ -73,7 +69,7 @@ const KakaoLogin = ({ navigation }) => {
     return (
         <View style={{ flex: 1 }}>
             <WebView
-                source={{ uri: `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}` }}
+                source={{ uri: `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}` }}
                 onNavigationStateChange={handleWebViewNavigationStateChange}
                 javaScriptEnabled={true}
             />
