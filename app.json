@@ -6,10 +6,15 @@
     "orientation": "portrait",
     "icon": "./assets/img/icon.png",
     "userInterfaceStyle": "light",
+    "extra": {
+      "kakaoClientId": "여기에 카카오 클라이언트 ID",
+      "kakaoRedirectUri": "여기에 리다이렉트 URI"
+    },
     "splash": {
       "image": "./assets/img/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
+      
     },
     "assetBundlePatterns": [
       "**/*"
