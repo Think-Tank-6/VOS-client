@@ -5,6 +5,8 @@ import Main from './component/main';
 import Login from './component/login';
 import Join from './component/join';
 import StarList from './component/starList';
+import KakaoLogin from './component/kakao_login';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -32,6 +34,13 @@ export default function App() {
           component={StarList}
           options={{ headerShown: false }} // 여기에 추가
         />
+        <Stack.Screen
+          name="KakaoLogin"
+          component={KakaoLogin}
+          options={{ headerShown: false }} // 여기에 추가
+        />
+
+
       </Stack.Navigator>
     </NavigationContainer>
   );

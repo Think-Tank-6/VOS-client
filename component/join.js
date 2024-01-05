@@ -21,7 +21,7 @@ function Join({ navigation }) {
   const [passwordError, setPasswordError] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [policy_aggrement_flag, setPolicy_aggrement_flag] = useState(false);
+  const [policy_agrement_flag, setPolicy_agrement_flag] = useState(false);
 
   const handleSubmit = async () => {
     if (password !== confirmPassword) {
@@ -29,7 +29,7 @@ function Join({ navigation }) {
       return; // 비밀번호가 다를 경우, 여기서 함수를 종료합니다.
     }
 
-    if (!policy_aggrement_flag) {
+    if (!policy_agrement_flag) {
       Alert.alert('약관 동의 필요', '회원가입을 위해 약관에 동의해주세요.');
       return;
     }
@@ -37,7 +37,7 @@ function Join({ navigation }) {
     setPasswordError('');
 
     try {
-      const response = await fetch('http://192.168.0.96:8000/auth/join', {
+      const response = await fetch('http://192.168.0.96:8000/users/join', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ function Join({ navigation }) {
           password,
           name,
           phone,
-          policy_aggrement_flag,
+          policy_agrement_flag,
         }),
       });
     
@@ -128,16 +128,16 @@ function Join({ navigation }) {
         {/* 체크박스와 동의 텍스트 */}
         <View style={styles.checkboxContainer}>
             <Switch
-              value={policy_aggrement_flag}
-              onValueChange={setPolicy_aggrement_flag}
+              value={policy_agrement_flag}
+              onValueChange={setPolicy_agrement_flag}
               trackColor={{ false: "#767577", true: "#81b0ff" }}
-              thumbColor={policy_aggrement_flag ? "#f5dd4b" : "#f4f3f4"}
+              thumbColor={policy_agrement_flag ? "#f5dd4b" : "#f4f3f4"}
             />
             <Text style={styles.checkboxText}>[필수] 약관에 동의합니다.</Text>
           </View>
 
         <Button title="회원가입" onPress={handleSubmit} 
-          disabled={!policy_aggrement_flag}  // policy_aggrement_flag가 false일 경우 버튼 비활성화
+          disabled={!policy_agrement_flag}  // policy_agrement_flag가 false일 경우 버튼 비활성화
         />
       </View>
       </ScrollView>

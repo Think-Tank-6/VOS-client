@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity,SafeAreaView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView } from 'react-native';
 
 function Login({ navigation }) {
     const [user_id, setuser_Id] = useState('');
     const [password, setPassword] = useState('');
 
+    // 일반 로그인 처리 함수
     const onLoginPress = async () => {
-        const loginData ={
-            user_id:user_id,
-            password:password,
+        const loginData = {
+            user_id: user_id,
+            password: password,
         };
         try {
-            let response = await fetch('http://192.168.0.96:8000/auth/login', {
+            let response = await fetch('http://192.168.0.96:8000/users/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -20,68 +21,79 @@ function Login({ navigation }) {
             });
 
             if (response.ok) {
-                // 로그인 성공 시 처리
                 let jsonResponse = await response.json();
-                // jsonResponse에 담긴 데이터로 로직 처리
                 navigation.navigate('StarList');
             } else {
-                // 로그인 실패 시 처리
                 console.log('Login failed:', response.statusText);
             }
         } catch (error) {
-            // 네트워크 오류 처리
             console.error('Network error:', error);
         }
     };
+
+    // 회원가입 페이지 이동 처리 함수
     const onMemberPress = () => {
         navigation.navigate('Join');
-      };
+    };
+
+    // 비밀번호 찾기 페이지 이동 처리 함수
     const onAddPress = () => {
         navigation.navigate('StarList');
-      };  
+    };  
+
+    // 카카오 로그인 처리 함수
+    const onKakaoLoginPress = () => {
+        navigation.navigate('KakaoLogin'); // 'KakaoLogin'은 카카오 로그인을 처리하는 화면으로 이동
+    };
 
     return (
-      <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
-        <SafeAreaView style={styles.safeArea}>
-            <View style={styles.topImageContainer}>
-            <Image source={require('../assets/img/title.png')} style={styles.centerImage}/>
-            </View>
-            <View style={styles.formContainer}>
-                <Text style={styles.label}>이메일</Text>
-                <TextInput
-                    style={styles.input}
-                    value={user_id}
-                    onChangeText={setuser_Id}
-                />
-                <Text style={styles.label}>비밀번호</Text>
-                <TextInput
-                    style={styles.input}
-                    value={password}
-                    onChangeText={setPassword}
-                />
+        <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.topImageContainer}>
+                    <Image source={require('../assets/img/title.png')} style={styles.centerImage}/>
+                </View>
+                <View style={styles.formContainer}>
+                    <Text style={styles.label}>이메일</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={user_id}
+                        onChangeText={setuser_Id}
+                    />
+                    <Text style={styles.label}>비밀번호</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={password}
+                        onChangeText={setPassword}
+                    />
 
-                <TouchableOpacity 
-                    style={styles.addButtonContainerPW} 
-                    onPress={onAddPress}
-                >
-                    <Text style={styles.addText}>비밀번호찾기</Text> 
-                </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={styles.addButtonContainerPW} 
+                        onPress={onAddPress}
+                    >
+                        <Text style={styles.addText}>비밀번호찾기</Text> 
+                    </TouchableOpacity>
 
-                <TouchableOpacity 
-                    style={styles.addButtonContainer} 
-                    onPress={onLoginPress}
-                >
-                    <Text style={styles.addLogin}>로그인</Text> 
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={styles.addButtonContainer} 
-                    onPress={onMemberPress}
-                >
-                    <Text style={styles.addMember}>회원가입</Text> 
-                </TouchableOpacity>
-            </View>
-        </SafeAreaView>
-      </ImageBackground>
+                    <TouchableOpacity 
+                        style={styles.addButtonContainer} 
+                        onPress={onLoginPress}
+                    >
+                        <Text style={styles.addLogin}>로그인</Text> 
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={styles.addButtonContainer} 
+                        onPress={onMemberPress}
+                    >
+                        <Text style={styles.addMember}>회원가입</Text> 
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={styles.kakaoButtonContainer} 
+                        onPress={onKakaoLoginPress}
+                    >
+                        <Text style={styles.kakaoButtonText}>카카오 로그인</Text>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
+        </ImageBackground>
     );
 }
 
@@ -152,6 +164,20 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         color : 'white'
      },
+     kakaoButtonContainer: {
+        height: 50, // Button height
+        backgroundColor: '#FEE500', // Kakao yellow color
+        justifyContent: 'center', // Vertically center the content
+        alignItems: 'center', // Horizontally center the content
+        borderRadius: 25, // Rounded corners
+        marginTop: 10, // Margin from the top
+        marginBottom: 20, // Margin from the bottom
+    },
+    kakaoButtonText: {
+        fontSize: 16, // Text size
+        color: '#000000', // Text color (black)
+        fontWeight: 'bold', // Bold text
+    },
     
 });
 
