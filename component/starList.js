@@ -6,21 +6,38 @@ import Generate from './generate';
 function StarList({ navigation }) {
     const [stars, setStars] = useState([]);
     const [modalVisible, setModalVisible] = useState(false); // Modal의 표시 상태를 관리하는 상태 변수를 추가합니다.
+    const [loggedInUserId, setLoggedInUserId] = useState(null);
 
 
     useEffect(() => {
         const fetchStars = async () => {
             try {
-                let response = await fetch('http://172.18.0.2:8000/stars'); // ip주소 확인 후 변경
-                let json = await response.json();
-                setStars(json.stars);
-              } catch (error) {
-                console.error('별을 가져오는 중 오류 발생:', error);
-              }
+                // 사용자의 로그인 상태를 확인하고, 사용자의 아이디를 얻어옵니다.
+                // 이 부분은 실제 사용하는 인증 시스템에 따라 다를 수 있습니다.
+                const isLoggedIn = true; // 예시로 사용자가 로그인되었다고 가정
+                if (isLoggedIn) {
+                    // 사용자의 아이디를 얻어와 상태 변수에 저장합니다.
+                    const userId = await getLoggedInUserId();
+                    setLoggedInUserId(userId);
+                    
+                    // 사용자의 아이디를 이용하여 서버에서 해당 사용자와 관련된 데이터를 가져옵니다.
+                    let response = await fetch(`http://192.168.0.96:8000/users/stars?userId=${userId}`);
+                    let json = await response.json();
+                    setStars(json.stars);
+                }
+            } catch (error) {
+                console.error('에러 발생:', error);
+            }
         };
 
         fetchStars();
     }, [])
+
+    const getLoggedInUserId = async () => {
+        // 실제 사용하는 인증 시스템에 따라 사용자 아이디를 얻어오는 방법을 구현합니다.
+        // 예: Firebase Authentication을 사용한다면 firebase.auth().currentUser.uid 등을 사용할 수 있습니다.
+        return "user123"; // 예시로 사용자 아이디를 반환
+    };
 
     const handleOpenModal = () => {
         setModalVisible(true);
@@ -35,6 +52,10 @@ function StarList({ navigation }) {
         <StatusBar style='light' />
         <View style={styles.logo}>
             <Image source={require('../assets/img/title.png')} style={styles.topImage}/>
+        </View>
+        <View style={styles.textContainer}>
+                {/* 로그인한 사용자의 아이디를 표시합니다. */}
+            <Text style={{ color: 'white' }}>로그인한 사용자: {loggedInUserId}</Text>
         </View>
         <TouchableOpacity style={styles.addButtonContainer} onPress={handleOpenModal}>
             <Text style={styles.plus}>+</Text>
@@ -106,6 +127,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+
     listBack: {
         width: '50%', // 화면 너비의 90%를 차지하도록 설정
         height: '50%', // 화면 높이의 50%를 차지하도록 설정
