@@ -1,40 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { GiftedChat, Bubble, Time } from 'react-native-gifted-chat';
 import { View, StyleSheet, ImageBackground, KeyboardAvoidingView, Image, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import moment from 'moment';
 import { useCallback } from 'react';
+import useSocket from '../hooks/useSocket';
 
 function Chat() {
   const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    const exampleMessages = [
-      {
-        _id: 0,
-        text: '아들아 잘 지내고있나',
-        createdAt: new Date(Date.now() - 60000), // 1분 전
-        user: {
-          _id: 0, // 사용자 ID가 동일하도록 설정합니다.
-          name: '아바지',
-          avatar: require('../assets/icon.png'),
-        },
-      },
-    ];
-  
-    // 메시지 배열을 역순으로 순회하며, 각 메시지가 연속된 메시지 그룹의 마지막인지 확인합니다.
-    const processedMessages = exampleMessages.reduceRight((acc, msg, index, array) => {
-      const nextMsg = index > 0 ? array[index - 1] : null;
-      const isLastInGroup = !nextMsg || msg.user._id !== nextMsg.user._id || 
-        !moment(msg.createdAt).isSame(nextMsg.createdAt, 'minute');
-      return [{ ...msg, showTime: isLastInGroup }, ...acc];
-    }, []);
-  
-    setMessages(processedMessages);
-  }, []);
+  const { ws, isConnected, sendMessage } = useSocket('123');
   
   const onSend = useCallback((newMessages = []) => {
     setMessages((previousMessages) => {
+      if (isConnected) {
+        newMessages.forEach((message) => {
+          const messageData = {
+            room_id: 1,
+            user_id: 'qwer',
+            star_id: 102,
+            message: message.text,
+          };
+          sendMessage(messageData);
+      });
+    }
+  
       let appendedMessages = GiftedChat.append(previousMessages, newMessages).sort((a, b) => b.createdAt - a.createdAt);
   
       // 마지막으로 시간을 표시한 메시지의 시간을 추적합니다.
@@ -59,7 +48,7 @@ function Chat() {
       // 배열을 다시 최신 메시지부터 오래된 메시지 순으로 정렬합니다.
       return updatedMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     });
-  }, []);
+  }, [isConnected, sendMessage]);
   
   // Bubble 커스터마이징 함수
   const renderBubble = (props) => {
@@ -105,6 +94,9 @@ function Chat() {
       <StatusBar style='light' />
       <View style={styles.logo}>
         <Image source={require('../assets/img/title.png')} style={styles.topImage} />
+      </View>
+      <View>
+
       </View>
       <GiftedChat
         messages={messages}
