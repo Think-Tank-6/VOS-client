@@ -4,8 +4,8 @@ import { WebView } from 'react-native-webview';
 import axios from 'axios';
 
 // 카카오 로그인을 위한 클라이언트 ID 및 리다이렉트 URI 설정
-const KAKAO_CLIENT_ID = "f2eaeb26e37e9478693d8ec953f63e26"; // 여기에 카카오 앱의 REST API 키 입력
-const KAKAO_REDIRECT_URI = "http://192.168.0.96:8000/users/kakao-login"; // 여기에 설정한 리다이렉트 URI 입력
+const KAKAO_CLIENT_ID = ""; // 여기에 카카오 앱의 REST API 키 입력
+const KAKAO_REDIRECT_URI = ""; // 여기에 설정한 리다이렉트 URI 입력
 
 const KakaoLogin = ({ navigation }) => {
     // 웹뷰에서 로그인 진행 상황을 추적하는 함수
