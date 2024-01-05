@@ -9,6 +9,7 @@ import Constants from 'expo-constants';
 
 const { kakaoClientId, kakaoRedirectUri } = Constants.manifest.extra;
 
+
 const KakaoLogin = ({ navigation }) => {
     // 웹뷰에서 로그인 진행 상황을 추적하는 함수
     const handleWebViewNavigationStateChange = (newNavState) => {
