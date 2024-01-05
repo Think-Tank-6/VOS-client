@@ -1,9 +1,51 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity,SafeAreaView } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import { useAuthRequest, ResponseType } from 'expo-auth-session';
+import { Button } from 'react-native';
+import load_dotenv from dotenv;
+
+load_dotenv()
+WebBrowser.maybeCompleteAuthSession();
+
+clientID = os.getenv("clientID")
 
 function Login({ navigation }) {
     const [user_id, setuser_Id] = useState('');
     const [password, setPassword] = useState('');
+    
+    // Google 로그인 설정
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        expoClientId: clientID,
+        iosClientId: clientID,
+        // androidClientId: clientID,
+        webClientId: clientID,
+        scopes: ['openid', 'profile'],
+        ...{useProxy: true},
+        responseType: ResponseType.IdToken,
+    });
+
+    React.useEffect(() => {
+        if (response?.type === 'success') {
+            // 로그인 성공 시 로직
+            this.onGoogleSignIn(response.authentication);
+            const { authentication } = response;
+            navigation.navigate('List');
+        } else if (response?.type === 'cancel') {
+            // 사용자가 로그인을 취소했을 때의 처리
+            console.log('Google login cancelled');
+        }
+    }, [response]);
+
+    const googleLogin = () => {
+        promptAsync();
+    };
+ 
+      
+    
+    
+ 
 
     // 일반 로그인 처리 함수
     const onLoginPress = async () => {
@@ -12,7 +54,7 @@ function Login({ navigation }) {
             password: password,
         };
         try {
-            let response = await fetch('http://172.20.144.1:8000/users/login', {
+            let response = await fetch('http://127.0.0.1:8000/users/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -73,27 +115,29 @@ function Login({ navigation }) {
                         <Text style={styles.addText}>비밀번호찾기</Text> 
                     </TouchableOpacity>
 
-                    <TouchableOpacity 
-                        style={styles.addButtonContainer} 
-                        onPress={onLoginPress}
-                    >
-                        <Text style={styles.addLogin}>로그인</Text> 
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                        style={styles.addButtonContainer} 
-                        onPress={onMemberPress}
-                    >
-                        <Text style={styles.addMember}>회원가입</Text> 
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                        style={styles.kakaoButtonContainer} 
-                        onPress={onKakaoLoginPress}
-                    >
-                        <Text style={styles.kakaoButtonText}>카카오 로그인</Text>
-                    </TouchableOpacity>
-                </View>
-            </SafeAreaView>
-        </ImageBackground>
+                <TouchableOpacity 
+                    style={styles.addButtonContainer} 
+                    onPress={onLoginPress}
+                >
+                    <Text style={styles.addLogin}>로그인</Text> 
+                </TouchableOpacity>
+
+                {/* google */}
+                <TouchableOpacity style={styles.googleButton} onPress={googleLogin}>
+                    <Text style={styles.buttonText}>Google 로그인</Text>
+                   
+                </TouchableOpacity>
+                 
+                
+                <TouchableOpacity 
+                    style={styles.addButtonContainer} 
+                    onPress={onMemberPress}
+                >
+                    <Text style={styles.addMember}>회원가입</Text> 
+                </TouchableOpacity>
+            </View>
+        </SafeAreaView>
+      </ImageBackground>
     );
 }
 
@@ -122,7 +166,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
-        marginTop: 10,
+        marginVertical: 10,
         color : 'white'
     },
     input: {
@@ -178,6 +222,16 @@ const styles = StyleSheet.create({
         color: '#000000', // Text color (black)
         fontWeight: 'bold', // Bold text
     },
+     googleButton: {
+        backgroundColor: '#db4437',
+        paddingHorizontal: 30,
+        paddingVertical: 15,
+        borderRadius: 5,
+      },
+      buttonText: {
+        color: 'white',
+        fontSize: 16,
+      },
     
 });
 

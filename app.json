@@ -6,6 +6,11 @@
     "orientation": "portrait",
     "icon": "./assets/img/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "voice-of-the-star",
+    "extra": {
+      "kakaoClientId": "여기에 카카오 클라이언트 ID",
+      "kakaoRedirectUri": "여기에 리다이렉트 URI"
+    },
     "splash": {
       "image": "./assets/img/splash.png",
       "resizeMode": "contain",
@@ -16,16 +21,32 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleSignIn": {
+          "webClientId": "532776290216-4e1uh996cbkq1h0f1pkb66nqmganh33v.apps.googleusercontent.com"
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
+        "package": "com.thinktank.voice-of-the-star",
         "foregroundImage": "./assets/img/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "config": {
+        "googleSignIn": {
+          "webClientId": "532776290216-4e1uh996cbkq1h0f1pkb66nqmganh33v.apps.googleusercontent.com"
+        }
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/img/favicon.png",
+      "config": {
+        "googleSignIn": {
+          "webClientId": "532776290216-4e1uh996cbkq1h0f1pkb66nqmganh33v.apps.googleusercontent.com"
+        }
+      }
     }
   }
 }

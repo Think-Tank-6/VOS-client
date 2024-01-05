@@ -1,18 +1,6 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  ImageBackground,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Button,
-  Alert,
-  Switch
-} from 'react-native';
-
+import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, ScrollView, Button, Alert, Switch } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
 function Join({ navigation }) {
   const [user_id, setuser_Id] = useState('');
@@ -76,15 +64,16 @@ function Join({ navigation }) {
     }
   };
 
-  return (
-    <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
-      <View style={styles.topImageContainer}>
-          <Image source={require('../assets/img/title.png')} style={styles.centerImage}/>
-      </View>
-      <ScrollView style={styles.scrollView}>
-      <View style={styles.container}>
-        <Text style={styles.label}>이메일</Text>
-        <View style={styles.inputContainer}>
+    return (
+      <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
+      <StatusBar style='light' />
+        <View style={styles.topImageContainer}>
+            <Image source={require('../assets/img/title.png')} style={styles.centerImage}/>
+        </View>
+        <ScrollView style={styles.scrollView}>
+        <View style={styles.container}>
+          <Text style={styles.label}>이메일</Text>
+          <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             value={user_id}
@@ -179,6 +168,9 @@ const styles = StyleSheet.create({
       alignItems: 'center', // 자식 요소를 가로 축의 가운데로 정렬합니다.
       justifyContent: 'center', 
       height: 100,
+      marginTop: 60,
+      padding:10,
+
     },
     centerImage: {
       width: '100%', // 이미지의 가로 크기를 조정합니다.
