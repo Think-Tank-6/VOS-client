@@ -21,7 +21,8 @@ function Join({ navigation }) {
   const [passwordError, setPasswordError] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [policy_agrement_flag, setPolicy_agrement_flag] = useState(false);
+  const [birth, setBirth] = useState('');
+  const [policy_agreement_flag, setpolicy_agreement_flag] = useState(false);
 
   const handleSubmit = async () => {
     if (password !== confirmPassword) {
@@ -29,7 +30,7 @@ function Join({ navigation }) {
       return; // 비밀번호가 다를 경우, 여기서 함수를 종료합니다.
     }
 
-    if (!policy_agrement_flag) {
+    if (!policy_agreement_flag) {
       Alert.alert('약관 동의 필요', '회원가입을 위해 약관에 동의해주세요.');
       return;
     }
@@ -47,12 +48,11 @@ function Join({ navigation }) {
           password,
           name,
           phone,
-          policy_agrement_flag,
+          birth,
+          image: "",
+          policy_agreement_flag: true,
         }),
       });
-    
-
-      console.log('After fetch:', response);
 
       if (response.ok) {
         // 회원가입 성공 시
@@ -90,7 +90,7 @@ function Join({ navigation }) {
             style={styles.button}
             onPress={() => {/* 인증 로직 */}}
           >
-            <Text>인증</Text>
+            <Text>중복확인</Text>
           </TouchableOpacity>
         </View>
 
@@ -119,25 +119,40 @@ function Join({ navigation }) {
         />
 
         <Text style={styles.label}>전화번호</Text>
+        <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           value={phone}
           onChangeText={setPhone}
         />
+        
+        <TouchableOpacity
+            style={styles.button}
+            onPress={() => {/* 인증 로직 */}}
+          >
+            <Text>인증</Text>
+          </TouchableOpacity>
+          </View>
 
+        <Text style={styles.label}>생년월일</Text>
+        <TextInput
+          style={styles.input}
+          value={birth}
+          onChangeText={setBirth}
+        />
         {/* 체크박스와 동의 텍스트 */}
         <View style={styles.checkboxContainer}>
             <Switch
-              value={policy_agrement_flag}
-              onValueChange={setPolicy_agrement_flag}
+              value={policy_agreement_flag}
+              onValueChange={setpolicy_agreement_flag}
               trackColor={{ false: "#767577", true: "#81b0ff" }}
-              thumbColor={policy_agrement_flag ? "#f5dd4b" : "#f4f3f4"}
+              thumbColor={policy_agreement_flag ? "#f5dd4b" : "#f4f3f4"}
             />
             <Text style={styles.checkboxText}>[필수] 약관에 동의합니다.</Text>
           </View>
 
         <Button title="회원가입" onPress={handleSubmit} 
-          disabled={!policy_agrement_flag}  // policy_agrement_flag가 false일 경우 버튼 비활성화
+          disabled={!policy_agreement_flag}  // policy_agrement_flag가 false일 경우 버튼 비활성화
         />
       </View>
       </ScrollView>

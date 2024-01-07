@@ -42,8 +42,6 @@ const KakaoLogin = ({ navigation }) => {
 
     // 서버로 토큰 전송
     const sendTokenToServer = async (accessToken) => {
-        console.log('Sending Token to Server:', accessToken);
-
         try {
             let response = await fetch('http://192.168.0.96:8000/users/kakao-login', {
                 method: 'POST',
@@ -55,8 +53,6 @@ const KakaoLogin = ({ navigation }) => {
     
             if (response.ok) {
                 let jsonResponse = await response.json();
-                console.log('Server Response:', jsonResponse);
-                console.log('Login Success:', jsonResponse);
                 navigation.navigate('StarList');
             } else {
                 console.error('Login Failed:', response.statusText);
