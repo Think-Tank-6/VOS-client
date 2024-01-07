@@ -3,28 +3,26 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform, FlatList, Dimension
 import { useFonts, Hurricane_400Regular } from '@expo-google-fonts/hurricane';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import UserList from '../components/userList';
+import AdminList from '../components/adminList';
 import { Ionicons } from '@expo/vector-icons';
-import Constants from 'expo-constants';
+import { useIsFocused } from '@react-navigation/native';
 
 
-const Admin = () => {
+const Admin = ({navigation}) => {
 
-  const [members, setMembers] = useState([]);
+  const [activeMenu, setActiveMenu] = useState('users');
+  const [selectedMember, setSelectedMember] = useState();
+  const isUsersFocused = activeMenu === 'users';
 
-  // 더미 데이터
-  const memberList = [
-    { user_id: 'jihye', name: 'User 1' },
-    { user_id: 'mkos__@nate.com', name: 'User 2' },
-    { user_id: 'user123', name: 'User 3' },
-   
-  ];
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:8000/admin')
-      .then(response => response.json())
-      .then(data => setMembers(data))
-      .catch(error => console.error(error));
-  }, []);
+  const handleMenuClick = (menuName) => {
+    setActiveMenu(menuName);
+  };
+  const handleUserItemClick = (userId) => {
+    // UserList에서 클릭 이벤트 처리
+    // 선택된 유저를 상태에 저장하고, UserDetail 화면으로 이동
+    const selectedUser = memberList.find((user) => user.user_id === userId);
+    navigation.navigate('UserDetail', { user: selectedUser });
+  };
 
   const [fontsLoaded] = useFonts({
     Hurricane: Hurricane_400Regular,
@@ -33,6 +31,7 @@ const Admin = () => {
     return <Text>Loading...</Text>;
   };
 
+  
   return (
     <View style={styles.adminPanel}>
       <View style={styles.sidebar}>
@@ -44,47 +43,48 @@ const Admin = () => {
             )}
         </View>
         <View style={styles.menu}>
-          {/* <TouchableOpacity style={styles.menuItem}>
-            {Platform.OS === 'web' ? (
-              <Text>Dashboard</Text>
-            ) : (
-              <FontAwesome name="home" size={24} color="black" />
-            )}
-          </TouchableOpacity> */}
-          <TouchableOpacity style={styles.menuItem}>
+         
+          <TouchableOpacity
+            style={[styles.menuItem, isUsersFocused && styles.focusedMenuItem]}
+            onPress={() => handleMenuClick('users')}
+            >
             {Platform.OS === 'web' ? (
               <View style={styles.menuFlex}>
-                <FontAwesome name="user" size={24} color="black" width={20} />
-                <Text style={styles.menuItemText}>users</Text>
+                <FontAwesome name="user" size={24} color={isUsersFocused ? 'white' : 'black'} width={20} />
+                <Text style={[styles.menuItemText, isUsersFocused && styles.focusedMenuItemText]}>users</Text>
               </View>
             ) : (
               <FontAwesome name="user" size={24} color="black" />
             )}
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.menuItem}>
+          
+          <TouchableOpacity
+            style={[styles.menuItem, activeMenu === 'admin' && styles.focusedMenuItem]}
+            onPress={() => handleMenuClick('admin')}
+          >
             {Platform.OS === 'web' ? (
-              <Text>posts</Text>
+              <View style={styles.menuFlex}>
+                <FontAwesome5 name="user-shield" size={20} color={activeMenu === 'admin' ? 'white' : 'black'} />
+                <Text style={[styles.menuItemText, activeMenu === 'admin' && styles.focusedMenuItemText]}>admin</Text>
+              </View>
             ) : (
-              <FontAwesome name="table" size={24} color="black" />
+              <FontAwesome5 name="user-shield" size={20} color="black"/>
             )}
             
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem}>
-            {Platform.OS === 'web' ? (
-              <Text>settings</Text>
-            ) : (
-              <Ionicons name="ios-settings-sharp" size={24} color="black" />
-            )}
-            
-          </TouchableOpacity> */}
+    
+          
         </View>
       </View>
       <View style={styles.main}>
-        {/* 회원 목록 섹션 */}
         <View style={styles.memberListContainer}>
-          {/* UserList 컴포넌트 사용 */}
-          <UserList memberList={memberList} /> 
+          {activeMenu === 'users' ? (
+           <UserList navigation={navigation} />
+        ) : (
+          <AdminList />
+        )}
         </View>
+        
       </View>
       </View>
   );
@@ -102,8 +102,6 @@ const styles = StyleSheet.create({
   sidebar: {
     width: '20%',
     minHeight: 690,
-    borderRightWidth: 1,
-    borderRightColor: '#ebebeb',
     borderRadius:20,
     backgroundColor: '#f7f7f7',
   },
@@ -130,6 +128,13 @@ const styles = StyleSheet.create({
     width: 50,
     marginLeft: 10,
   },
+  focusedMenuItem: {
+    backgroundColor: 'black',
+    
+  },
+  focusedMenuItemText: {
+    color: 'white',
+  },
   menuFlex: {
     display: 'flex',
     flexDirection: 'row',
@@ -148,17 +153,8 @@ const styles = StyleSheet.create({
     margin: Platform.OS === 'web' ? 25 : 25,
     
   },
-  chartContainer: {
-    marginBottom: 20,
-  },
-  chartTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  chartStyle: {
-    marginVertical: 8,
-    borderRadius: 16,
+  focusedMenuItemText: {
+    color: 'white',
   },
 });
 
