@@ -1,42 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import Generate from './generate'; 
+import Generate from './generate';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function StarList({ navigation }) {
     const [stars, setStars] = useState([]);
-    const [modalVisible, setModalVisible] = useState(false); // Modal의 표시 상태를 관리하는 상태 변수를 추가합니다.
+    const [modalVisible, setModalVisible] = useState(false);
     const [loggedInUserId, setLoggedInUserId] = useState(null);
-
 
     useEffect(() => {
         const fetchStars = async () => {
             try {
-                // 사용자의 로그인 상태를 확인하고, 사용자의 아이디를 얻어옵니다.
-                // 이 부분은 실제 사용하는 인증 시스템에 따라 다를 수 있습니다.
-                const isLoggedIn = true; // 예시로 사용자가 로그인되었다고 가정
-                if (isLoggedIn) {
-                    // 사용자의 아이디를 얻어와 상태 변수에 저장합니다.
-                    const userId = await getLoggedInUserId();
+                const userId = await getLoggedInUserId();
+                console.log(userId);
+                if (userId) {
                     setLoggedInUserId(userId);
                     
                     // 사용자의 아이디를 이용하여 서버에서 해당 사용자와 관련된 데이터를 가져옵니다.
-                    let response = await fetch(`http://172.20.144.1:8000/users/stars?userId=${userId}`);
+                    let response = await fetch(`http://192.168.0.96:8000/users/stars?userId=${userId}`);
                     let json = await response.json();
                     setStars(json.stars);
                 }
             } catch (error) {
-                console.error('에러 발생:', error);
+                console.error('Error fetching stars:', error);
             }
         };
 
         fetchStars();
-    }, [])
+    }, []);
 
     const getLoggedInUserId = async () => {
-        // 실제 사용하는 인증 시스템에 따라 사용자 아이디를 얻어오는 방법을 구현합니다.
-        // 예: Firebase Authentication을 사용한다면 firebase.auth().currentUser.uid 등을 사용할 수 있습니다.
-        return "user123"; // 예시로 사용자 아이디를 반환
+        try {
+            const userId = await AsyncStorage.getItem('userId');
+            console.log("Fetched user ID: ", userId); // 디버그 출력
+            return userId;
+        } catch (error) {
+            console.error('Error fetching user id', error);
+            return null;
+        }
     };
 
     const handleOpenModal = () => {
@@ -46,35 +48,38 @@ function StarList({ navigation }) {
     const handleCloseModal = () => {
         setModalVisible(false);
     };
+    
+    const navigateToSettings = () =>{
+        navigation.navigate('setting');
+    };
 
     return (
-      <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper}>
-        <StatusBar style='light' />
-        <View style={styles.logo}>
-            <Image source={require('../assets/img/title.png')} style={styles.topImage}/>
-        </View>
-        <View style={styles.textContainer}>
-                {/* 로그인한 사용자의 아이디를 표시합니다. */}
-            <Text style={{ color: 'white' }}>로그인한 사용자: {loggedInUserId}</Text>
-        </View>
-        <TouchableOpacity style={styles.addButtonContainer} onPress={handleOpenModal}>
-            <Text style={styles.plus}>+</Text>
-            <Text style={styles.addText}>채팅을 추가하세요</Text>
-        </TouchableOpacity>
-        {/* 팝업으로 사용될 Modal 컴포넌트를 추가합니다. */}
-        <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={handleCloseModal}
-        >
-            <View style={styles.centeredModalView}>
-                <Generate closeModal={handleCloseModal} />
+        <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper}>
+            <StatusBar style='light' />
+            <View style={styles.logo}>
+                <Image source={require('../assets/img/title.png')} style={styles.topImage}/>
             </View>
-        </Modal>
-        {/* 설정 버튼 - 이 부분은 현재 사용되지 않음 */}
-        {/* 추후 필요에 따라 onSettingsPress 함수 추가 및 연결 가능 */}
-      </ImageBackground>
+            <View style={styles.textContainer}>
+                <Text style={{ color: 'white' }}>로그인한 사용자: {loggedInUserId}</Text>
+            </View>
+            <TouchableOpacity style={styles.addButtonContainer} onPress={handleOpenModal}>
+                <Text style={styles.plus}>+</Text>
+                <Text style={styles.addText}>채팅을 추가하세요</Text>
+            </TouchableOpacity>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={handleCloseModal}
+            >
+                <View style={styles.centeredModalView}>
+                    <Generate closeModal={handleCloseModal} />
+                </View>
+            </Modal>
+            <TouchableOpacity style={styles.settingsButton} onPress={navigateToSettings}>
+                <Image source={require('../assets/img/cog.png')} style={styles.settingsImage}/>
+            </TouchableOpacity>
+        </ImageBackground>
     );
 }
 
@@ -152,7 +157,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    
+    settingsButton: {
+        position: 'absolute',
+        right: 10,
+        bottom: 10, // Adjust the position as needed
+    },
+    settingsImage: {
+        width: 30, // Adjust size as needed
+        height: 30, // Adjust size as needed
+    },
 });
 
 export default StarList;

@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Login({ navigation }) {
     const [user_id, setuser_Id] = useState('');
     const [password, setPassword] = useState('');
 
-    // 일반 로그인 처리 함수
     const onLoginPress = async () => {
         const loginData = {
             user_id: user_id,
             password: password,
         };
         try {
-            let response = await fetch('http://172.20.144.1:8000/users/login', {
+            let response = await fetch('http://192.168.0.96:8000/users/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -20,11 +20,13 @@ function Login({ navigation }) {
                 body: JSON.stringify(loginData),
             });
 
-            if (response.ok) {
-                let jsonResponse = await response.json();
+            let jsonResponse = await response.json();
+
+            if (response.ok && jsonResponse.userId) {
+                await AsyncStorage.setItem('userId', jsonResponse.userId);
                 navigation.navigate('StarList');
             } else {
-                console.log('Login failed:', response.statusText);
+                console.log('Login failed or UserId is undefined:', response.statusText, jsonResponse);
             }
         } catch (error) {
             console.error('Network error:', error);
@@ -38,7 +40,7 @@ function Login({ navigation }) {
 
     // 비밀번호 찾기 페이지 이동 처리 함수
     const onAddPress = () => {
-        navigation.navigate('StarList');
+        navigation.navigate('mypage');
     };  
 
     // 카카오 로그인 처리 함수
