@@ -8,6 +8,10 @@ import StarList from './component/starList';
 import KakaoLogin from './component/kakao_login';
 import Admin from './admin/navigation/admin';
 import UserDetail from './admin/components/userDetail';
+import Setting from './component/setting';
+import Mypage from './component/mypage'
+import Pwupdate from './component/pwupdate';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -51,6 +55,22 @@ export default function App() {
           name="UserDetail" 
           component={UserDetail}
         />
+        <Stack.Screen
+          name="setting"
+          component={Setting}
+          options={{ headerShown: false }} // 여기에 추가
+        />
+        <Stack.Screen
+          name="mypage"
+          component={Mypage}
+          options={{ headerShown: false }} // 여기에 추가
+        />
+        <Stack.Screen
+          name="pwupdate"
+          component={Pwupdate}
+          options={{ headerShown: false }} // 여기에 추가
+        />
+
 
       </Stack.Navigator>
 
