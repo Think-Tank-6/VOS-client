@@ -21,7 +21,7 @@ function StarList({ navigation }) {
                     setLoggedInUserId(userId);
                     
                     // 사용자의 아이디를 이용하여 서버에서 해당 사용자와 관련된 데이터를 가져옵니다.
-                    let response = await fetch(`http://192.168.0.96:8000/users/stars?userId=${userId}`);
+                    let response = await fetch(`http://172.20.144.1:8000/users/stars?userId=${userId}`);
                     let json = await response.json();
                     setStars(json.stars);
                 }

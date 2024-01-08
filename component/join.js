@@ -38,7 +38,8 @@ function Join({ navigation }) {
     setPasswordError('');
 
     try {
-      const response = await fetch('http://192.168.0.96:8000/users/join', {
+      
+      const response = await fetch('http://172.20.144.1:8000/users/join', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,6 +54,9 @@ function Join({ navigation }) {
           policy_agreement_flag: true,
         }),
       });
+    
+
+      console.log('After fetch:', response);
 
       if (response.ok) {
         // 회원가입 성공 시

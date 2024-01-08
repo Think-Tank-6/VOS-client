@@ -85,7 +85,7 @@ const Generate = ({ closeModal }) => {
     }
 
     try {
-        const response = await fetch('http://172.18.0.2:8000/stars', {  // ip 주소 설정필요
+        const response = await fetch('http://172.20.144.1:8000/stars', {  // ip 주소 설정필요
             method: 'POST',
             headers: {
                 'Content-Type': 'multipart/form-data',
