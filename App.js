@@ -20,7 +20,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-      {/* <Stack.Screen
+      <Stack.Screen
           name="Main"
           component={Main}
           options={{ headerShown: false }} // 여기에 추가
@@ -44,7 +44,7 @@ export default function App() {
           name="KakaoLogin"
           component={KakaoLogin}
           options={{ headerShown: false }} // 여기에 추가
-        /> */}
+        />
         <Stack.Screen 
           name="Admin" 
           component={Admin} 
@@ -73,11 +73,6 @@ export default function App() {
 
 
       </Stack.Navigator>
-
-      
-          
-      
-
     </NavigationContainer>
   );
 }

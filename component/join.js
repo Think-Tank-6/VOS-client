@@ -23,7 +23,37 @@ function Join({ navigation }) {
   const [phone, setPhone] = useState('');
   const [birth, setBirth] = useState('');
   const [policy_agreement_flag, setpolicy_agreement_flag] = useState(false);
+  const [isEmailChecked, setIsEmailChecked] = useState(false);
 
+  // 이메일 중복 체크
+  const checkEmail = async () => {
+    try {
+      const response = await fetch('http://192.168.0.96:9000/users/join/email-check', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          input_email: user_id, // 이메일 필드의 값을 사용
+        }),
+      });
+  
+      const jsonResponse = await response.json(); // 응답을 JSON으로 변환
+      if (jsonResponse.status === "available") {
+        setIsEmailChecked(true); // 이메일이 사용 가능하면 상태 업데이트
+        Alert.alert("회원가입 가능", "회원가입 가능한 이메일입니다.");
+      } else if (jsonResponse.status === "unavailable") {
+        setIsEmailChecked(false); // 이메일이 사용 불가능하면 상태 업데이트
+        Alert.alert("중복된 이메일", "중복된 이메일입니다.");
+      }
+    } catch (error) {
+      console.error('Error checking email:', error);
+      Alert.alert("네트워크 오류", error.toString());
+    }
+  };
+
+  const isSignupDisabled = !isEmailChecked || !user_id || !password || !confirmPassword || !name || !phone || !birth || !policy_agreement_flag;
+// 비밀번호 체크
   const handleSubmit = async () => {
     if (password !== confirmPassword) {
       setPasswordError('비밀번호가 다릅니다.');
@@ -53,10 +83,9 @@ function Join({ navigation }) {
           policy_agreement_flag: true,
         }),
       });
+
+      
     
-
-      console.log('After fetch:', response);
-
       if (response.ok) {
         // 회원가입 성공 시
         Alert.alert("회원가입 성공", "회원가입이 완료되었습니다.");
@@ -89,10 +118,7 @@ function Join({ navigation }) {
             value={user_id}
             onChangeText={setuser_Id}
           />
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {/* 인증 로직 */}}
-          >
+          <TouchableOpacity style={styles.button} onPress={checkEmail}>
             <Text>중복확인</Text>
           </TouchableOpacity>
         </View>
@@ -154,9 +180,7 @@ function Join({ navigation }) {
             <Text style={styles.checkboxText}>[필수] 약관에 동의합니다.</Text>
           </View>
 
-        <Button title="회원가입" onPress={handleSubmit} 
-          disabled={!policy_agreement_flag}  // policy_agrement_flag가 false일 경우 버튼 비활성화
-        />
+          <Button title="회원가입" onPress={handleSubmit} disabled={isSignupDisabled} />
       </View>
       </ScrollView>
     </ImageBackground>
