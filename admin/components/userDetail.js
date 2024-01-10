@@ -1,7 +1,7 @@
 // 상세페이지、 수정
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
-
+import { API_URL } from '@env';
 
 const UserDetail = ({ route }) => {
   const { user } = route.params;

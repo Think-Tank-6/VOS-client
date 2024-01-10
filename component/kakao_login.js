@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from "react-native";
 import { WebView } from 'react-native-webview';
 import axios from 'axios';
-import { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } from '@env';
+import { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, API_URL } from '@env';
 
 const KakaoLogin = ({ navigation }) => {
     // 웹뷰에서 로그인 진행 상황을 추적하는 함수

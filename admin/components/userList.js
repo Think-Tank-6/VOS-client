@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, CheckBox } from 'react-native';
-
+import { API_URL } from '@env';
 
 
 const UserList = ({ navigation }) => {

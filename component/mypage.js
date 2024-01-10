@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView,Text } from 'react-native';
+import { API_URL } from '@env';
 
 // async function fetchUserInfo() {
 //     try {

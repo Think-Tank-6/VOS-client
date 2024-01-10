@@ -12,7 +12,7 @@ import {
   Alert,
   Switch
 } from 'react-native';
-
+import { API_URL } from '@env';
 
 function Join({ navigation }) {
   const [user_id, setuser_Id] = useState('');
