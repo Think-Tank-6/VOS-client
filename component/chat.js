@@ -1,109 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { GiftedChat, Bubble, Time } from 'react-native-gifted-chat';
 import { View, StyleSheet, ImageBackground, KeyboardAvoidingView, Image, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import moment from 'moment';
-import { useCallback } from 'react';
 import useSocket from '../hooks/useSocket';
+import { API_URL } from '@env';
 
-function Chat() {
+function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
-  const { ws, isConnected, sendMessage } = useSocket('123');
-  
-  const onSend = useCallback((newMessages = []) => {
-    setMessages((previousMessages) => {
-      if (isConnected) {
-        newMessages.forEach((message) => {
-          const messageData = {
-            room_id: 1,
-            user_id: 'qwer',
-            star_id: 102,
-            message: message.text,
-          };
-          sendMessage(messageData);
-      });
+  const { roomID } = route.params; // Assuming roomID is passed as a route parameter
+  const [clientID, setClientID] = useState('YourClientID'); // Set this to the actual clientID
+  const [starId, setStarId] = useState('YourStarID'); // Set this to the actual starId
+
+  // Fetch initial chat messages
+  const fetchChatInfo = async () => {
+    try {
+      // Fetch existing messages for the room
+      const messagesResponse = await fetch(`${API_URL}/chat/${roomID}/messages`);
+      const messagesData = await messagesResponse.json();
+      setMessages(messagesData.map(m => ({ ...m, createdAt: new Date(m.createdAt) })));
+    } catch (error) {
+      console.error('Error fetching chat info:', error);
     }
-  
-      let appendedMessages = GiftedChat.append(previousMessages, newMessages).sort((a, b) => b.createdAt - a.createdAt);
-  
-      // 마지막으로 시간을 표시한 메시지의 시간을 추적합니다.
-      let lastShownTimestamp = null;
-  
-      // 메시지들을 역순으로 순회하면서 showTime을 결정합니다.
-      const updatedMessages = appendedMessages.map((msg) => {
-        const createdAt = moment(msg.createdAt);
-        let showTime = true;
-  
-        // 이전에 시간이 표시된 메시지가 있고, 같은 분에 속하며, 같은 사용자의 메시지라면 시간을 숨깁니다.
-        if (lastShownTimestamp && createdAt.isSame(lastShownTimestamp, 'minute') && createdAt.isSame(lastShownTimestamp, 'day') && msg.user._id === appendedMessages[0].user._id) {
-          showTime = false;
-        } else {
-          // 새로운 메시지의 시간을 표시해야 하므로, lastShownTimestamp를 현재 메시지의 시간으로 업데이트합니다.
-          lastShownTimestamp = msg.createdAt;
-        }
-  
-        return { ...msg, showTime };
-      });
-  
-      // 배열을 다시 최신 메시지부터 오래된 메시지 순으로 정렬합니다.
-      return updatedMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    });
-  }, [isConnected, sendMessage]);
-  
-  // Bubble 커스터마이징 함수
-  const renderBubble = (props) => {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: '#3D9F88', // 오른쪽(나의 메시지) 버블의 배경색
-          },
-          left: {
-            backgroundColor: '#92C3D2', // 왼쪽(상대방의 메시지) 버블의 배경색
-          },
-        }}
-        textStyle={{
-          right: { color: '#333' },
-          left: { color: '#333' },
-        }}
-        timeTextStyle={{
-          right: { color: '#333' },
-          left: { color: '#333' },
-        }}
-      />
-    );
   };
 
-  const renderTime = (props) => {
-    const { currentMessage } = props;
-  
-    if (!currentMessage.showTime) {
-      // showTime 속성이 false라면 시간을 표시하지 않습니다.
-      return null;
-    }
-  
-    // showTime 속성이 true라면 시간을 표시합니다.
-    return (
-      <Time {...props} />
-    );
-  };
-  
+  useEffect(() => {
+    fetchChatInfo();
+  }, [roomID]);
+
+  const { isConnected, sendMessage } = useSocket(clientID, starId);
+
+  const onSend = useCallback((newMessages = []) => {
+    setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
+    newMessages.forEach(message => {
+      const messageData = {
+        room_id: roomID,
+        user_id: clientID,
+        star_id: starId,
+        content: message.text,
+      };
+      if (isConnected) {
+        sendMessage(messageData);
+      } else {
+        console.error("WebSocket is not connected");
+      }
+    });
+  }, [isConnected, sendMessage, roomID, clientID, starId]);
+
+  // Render functions for customizing the chat bubbles and timestamps
+  const renderBubble = props => (
+    <Bubble
+      {...props}
+      wrapperStyle={{
+        right: { backgroundColor: '#3D9F88' },
+        left: { backgroundColor: '#92C3D2' },
+      }}
+      textStyle={{
+        right: { color: '#333' },
+        left: { color: '#333' },
+      }}
+      timeTextStyle={{
+        right: { color: '#333' },
+        left: { color: '#333' },
+      }}
+    />
+  );
+
+  const renderTime = props => (
+    <Time {...props} />
+  );
+
   return (
     <ImageBackground style={styles.wrapper} source={require('../assets/img/background.png')}>
       <StatusBar style='light' />
       <View style={styles.logo}>
         <Image source={require('../assets/img/title.png')} style={styles.topImage} />
       </View>
-      <View>
-
-      </View>
       <GiftedChat
         messages={messages}
         onSend={newMessages => onSend(newMessages)}
-        user={{ _id: 1 }}
-        renderTime={renderTime}
+        user={{ _id: clientID }}
         renderBubble={renderBubble}
+        renderTime={renderTime}
       />
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} />
     </ImageBackground>

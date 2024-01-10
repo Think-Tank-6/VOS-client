@@ -3,6 +3,7 @@ import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet } from 
 import * as DocumentPicker from 'expo-document-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Loading from './loading';
+import { API_URL } from '@env';
 
 const Generate = ({ closeModal }) => {
   const [name, setName] = useState('');
@@ -85,7 +86,7 @@ const Generate = ({ closeModal }) => {
     }
 
     try {
-        const response = await fetch('http://172.20.144.1:8000/stars', {  // ip 주소 설정필요
+        const response = await fetch(`${API_URL}/stars`, {  // ip 주소 설정필요
             method: 'POST',
             headers: {
                 'Content-Type': 'multipart/form-data',

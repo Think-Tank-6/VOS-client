@@ -3,7 +3,7 @@ import { View, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaVie
 
 // async function fetchUserInfo() {
 //     try {
-//       const response = await fetch('http://192.168.0.96:8000/users/');
+//       const response = await fetch(`${API_URL}/users/`);
 //       const json = await response.json();
 //       return json;
 //     } catch (error) {

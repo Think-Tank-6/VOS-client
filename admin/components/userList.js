@@ -14,7 +14,7 @@ const UserList = ({ navigation }) => {
   
   const fetchUsers = (page) => {
 
-    const url = `http://172.20.144.1:8000/admin/user-list?page=${page}&page_size=8`;
+    const url = `${API_URL}/admin/user-list?page=${page}&page_size=8`;
    
     fetch(url)
       .then(response => response.json())

@@ -12,7 +12,7 @@ function Login({ navigation }) {
             password: password,
         };
         try {
-            let response = await fetch('http://192.168.0.96:8000/users/login', {
+            let response = await fetch(`${API_URL}/users/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
