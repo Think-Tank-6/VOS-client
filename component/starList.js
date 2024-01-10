@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Generate from './generate';
+import { API_URL } from '@env';
 
 function StarList({ navigation }) {
     const [stars, setStars] = useState([]);
