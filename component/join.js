@@ -28,7 +28,7 @@ function Join({ navigation }) {
   // 이메일 중복 체크
   const checkEmail = async () => {
     try {
-      const response = await fetch('http://192.168.0.96:9000/users/join/email-check', {
+      const response = await fetch(`${API_URL}/users/join/email-check`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ function Join({ navigation }) {
     setPasswordError('');
 
     try {
-      const response = await fetch('http://192.168.0.96:8000/users/join', {
+      const response = await fetch(`${API_URL}/users/join`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

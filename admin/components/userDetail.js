@@ -8,7 +8,7 @@ const UserDetail = ({ route }) => {
   const [userDetails, setUserDetails] = useState({});
 
   useEffect(() => {
-    fetch(`http://172.20.144.1:8000/admin/user-list/${user.user_id}`)
+    fetch(`${API_URL}/admin/user-list/${user.user_id}`)
       .then(response => response.json())
       .then(data => {
         setUserDetails(data);

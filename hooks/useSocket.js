@@ -1,28 +1,25 @@
 import { useState, useEffect } from 'react';
 
-const useSocket = (clientID) => {
+const useSocket = (clientID, roomID, onMessageReceived) => {
   const [ws, setWs] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const websocket = new WebSocket(`ws://192.168.0.69:8000/chat/${clientID}`);
+    const websocket = new WebSocket(`ws://192.168.0.69:8000/chat/${clientID}/${roomID}`);
     setWs(websocket);
 
-    const timeout = 20000; // 20초로 설정
-    
-    const timer = setTimeout(() => {
-      websocket.close();
-      console.error('WebSocket connection timeout');
-    }, timeout);
-
     websocket.onopen = () => {
-      clearTimeout(timer);
       setIsConnected(true);
       console.log('Connected to the WebSocket server');
     };
 
+    websocket.onmessage = (event) => {
+      // 서버로부터 메시지를 받으면 onMessageReceived 콜백을 호출합니다.
+      const message = JSON.parse(event.data);
+      onMessageReceived(message);
+    };
+
     websocket.onerror = () => {
-      clearTimeout(timer); // 에러 발생 시 타임아웃 타이머를 해제
       console.error('WebSocket error occurred');
     };
 
@@ -34,7 +31,7 @@ const useSocket = (clientID) => {
     return () => {
       websocket.close();
     };
-  }, [clientID]);
+  }, [clientID, roomID, onMessageReceived]);
 
   const sendMessage = (message) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
