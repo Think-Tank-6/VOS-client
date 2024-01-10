@@ -75,7 +75,7 @@ function StarList({ navigation }) {
             return (
                 <View style={styles.emptyContainer}>
                     <TouchableOpacity style={styles.addButtonContainerEmpty} onPress={handleOpenModal}>
-                        <Image source={require('../assets/plus.png')} style={styles.plusImage} />
+                        <Image source={require('../assets/img/plus.png')} style={styles.plusImage} />
                         <Text style={styles.addText}>채팅을 추가하세요</Text>
                     </TouchableOpacity>
                 </View>
