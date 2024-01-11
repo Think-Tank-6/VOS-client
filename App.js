@@ -11,6 +11,8 @@ import UserDetail from './admin/components/userDetail';
 import Setting from './component/setting';
 import Mypage from './component/mypage'
 import Pwupdate from './component/pwupdate';
+import Login from './admin/components/login';
+import Join from './admin/components/join';
 
 
 
@@ -50,7 +52,6 @@ export default function App() {
           component={Admin} 
           options={{ headerShown: false }}
         />
-        
         <Stack.Screen 
           name="UserDetail" 
           component={UserDetail}
@@ -70,8 +71,15 @@ export default function App() {
           component={Pwupdate}
           options={{ headerShown: false }} // 여기에 추가
         />
-
-
+        <Stack.Screen 
+          name="lgoin" 
+          component={Login}
+        />
+        
+        <Stack.Screen 
+          name="join" 
+          component={Join}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
