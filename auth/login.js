@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useState,useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView, loggedInUserId } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
 
@@ -7,11 +7,29 @@ function Login({ navigation }) {
     const [user_id, setuser_Id] = useState('');
     const [password, setPassword] = useState('');
 
+    useEffect(() => {
+        const fetchUserId = async () => {
+            try {
+                const userId = await AsyncStorage.getItem('userId');
+                if (userId) {
+                    setLoggedInUserId(userId);
+                } else {
+                    console.log("No userId found in AsyncStorage");
+                }
+            } catch (error) {
+                console.error('Error fetching user id from AsyncStorage:', error);
+            }
+        };
+    
+        fetchUserId();
+    }, [loggedInUserId]);
+
     const onLoginPress = async () => {
         const loginData = {
             user_id: user_id,
             password: password,
         };
+
         try {
             let response = await fetch(`${API_URL}/users/login`, {
                 method: 'POST',
@@ -20,20 +38,26 @@ function Login({ navigation }) {
                 },
                 body: JSON.stringify(loginData),
             });
-
+    
             let jsonResponse = await response.json();
 
-            if (response.ok && jsonResponse.userId) {
-                await AsyncStorage.setItem('userId', jsonResponse.userId);
+            if (response.ok && jsonResponse.access_token) {
+                await AsyncStorage.setItem('accessToken', jsonResponse.access_token);
+                // userId가 있는지 확인하고 저장합니다.
+                if (jsonResponse.userId) {
+                    await AsyncStorage.setItem('userId', jsonResponse.userId);
+                } else {
+                    console.log("No userId in response");
+                }
+
                 navigation.navigate('StarList');
             } else {
-                console.log('Login failed or UserId is undefined:', response.statusText, jsonResponse);
+                console.log('Login failed or accessToken is undefined:', jsonResponse);
             }
         } catch (error) {
             console.error('Network error:', error);
         }
     };
-
     // 회원가입 페이지 이동 처리 함수
     const onMemberPress = () => {
         navigation.navigate('Join');

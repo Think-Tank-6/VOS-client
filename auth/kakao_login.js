@@ -6,8 +6,6 @@ import { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI, API_URL } from '@env';
 
 const KakaoLogin = ({ navigation }) => {
     // 웹뷰에서 로그인 진행 상황을 추적하는 함수
-    console.log('카카오클라',KAKAO_CLIENT_ID);
-    console.log('URI',KAKAO_REDIRECT_URI);
     const handleWebViewNavigationStateChange = (newNavState) => {
         const { url } = newNavState;
         if (!url) return;
@@ -19,24 +17,38 @@ const KakaoLogin = ({ navigation }) => {
             requestToken(code);
         }
     };
+    
 
     // 카카오 토큰 요청 함수
     const requestToken = async (code) => {
         try {
+            const tokenRequestParams = {
+                grant_type: 'authorization_code',
+                client_id: KAKAO_CLIENT_ID,
+                redirect_uri: KAKAO_REDIRECT_URI,
+                code,
+            };
             
+            console.log('Requesting token with params:', tokenRequestParams);
+    
             const response = await axios.post("https://kauth.kakao.com/oauth/token", null, {
-                params: {
-                    grant_type: 'authorization_code',
-                    client_id: KAKAO_CLIENT_ID,
-                    redirect_uri: KAKAO_REDIRECT_URI,
-                    code,
-                },
+                params: tokenRequestParams,
             });
-
+    
             const accessToken = response.data.access_token;
+            console.log('Received accessToken:', accessToken);
             sendTokenToServer(accessToken);
         } catch (error) {
-            console.error('Error requesting token:', error);
+            console.error('Error requesting token:', error.response ? error.response.data : error);
+        }
+    };
+    
+    const handleLoginResponse = async (response) => {
+        const userId = response.userId;
+        try {
+            navigation.navigate('StarList');
+        } catch (error) {
+            console.error('Error saving user id', error);
         }
     };
 
@@ -53,7 +65,8 @@ const KakaoLogin = ({ navigation }) => {
     
             if (response.ok) {
                 let jsonResponse = await response.json();
-                navigation.navigate('StarList');
+                // console.log("Server Response:", jsonResponse); // 서버 응답 로그
+                handleLoginResponse(jsonResponse); // 응답 처리 함수 호출
             } else {
                 console.error('Login Failed:', response.statusText);
             }
