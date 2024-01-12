@@ -13,8 +13,8 @@ function StarList({ navigation }) {
     // Access Token (인증이 필요한 경우 사용)
     // 실제 앱에서는 로그인 후 받은 token을 사용해야 합니다.
     
-    const navigateToChat = (userId) => {
-        navigation.navigate('Chat', { userId });
+    const navigateToChat = (star_id) => {
+        navigation.navigate('Chat', { star_id });
     };
     const navigateToMypage = () => {
         navigation.navigate('setting'); // 'Mypage'는 설정 페이지로 이동하는 라우트 이름입니다.
@@ -46,7 +46,7 @@ function StarList({ navigation }) {
             });
             const json = await response.json();
             const starsWithMessages = await Promise.all(json.stars.map(async (star) => {
-                const lastMessage = await fetchLastMessage(star.id, accessToken);
+                const lastMessage = await fetchLastMessage(star.star_id, accessToken);
                 return { ...star, lastMessage };
             }));
             setStars(starsWithMessages);
@@ -99,7 +99,7 @@ function StarList({ navigation }) {
             return (
                 <View style={styles.starsListContainer}>
                     {stars.map((star, index) => (
-                        <TouchableOpacity key={star.id || index} onPress={() => navigateToChat(star.id)} style={styles.starItem}>
+                        <TouchableOpacity key={star.star_id || index} onPress={() => navigateToChat(star.star_id)} style={styles.starItem}>
                             <Image source={{ uri: star.image }} style={styles.starImage} />
                             <View style={styles.starInfoContainer}>
                                 <Text style={styles.starName}>{star.star_name}</Text>

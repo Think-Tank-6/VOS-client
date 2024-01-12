@@ -5,46 +5,60 @@ import { StatusBar } from 'expo-status-bar';
 import useSocket from '../hooks/useSocket';
 import { API_URL } from '@env';
 
-function Chat({ route, navigation }) {
+function Chat({ route }) {
   const [messages, setMessages] = useState([]);
-  const { roomID } = route.params; // Assuming roomID is passed as a route parameter
-  const [clientID, setClientID] = useState('YourClientID'); // Set this to the actual clientID
-  const [starId, setStarId] = useState('YourStarID'); // Set this to the actual starId
+  const { star_id } = route.params; // Extract star_id from navigation parameters
+  const [starId, setStarId] = useState(star_id); // Use the passed star_id
 
   // Fetch initial chat messages
   const fetchChatInfo = async () => {
     try {
-      // Fetch existing messages for the room
-      const messagesResponse = await fetch(`${API_URL}/chat/${roomID}/messages`);
+      // Fetch existing messages for the star
+      const messagesResponse = await fetch(`${API_URL}/chat/${star_id}/messages`);
       const messagesData = await messagesResponse.json();
-      setMessages(messagesData.map(m => ({ ...m, createdAt: new Date(m.createdAt) })));
+      setMessages(messagesData.map(m => ({
+        _id: new Date(m.created_at).getTime(), // 고유 식별자
+        text: m.content.content, // 메시지 텍스트
+        createdAt: new Date(m.created_at),
+        user: {
+          _id: m.sender === 'user' ? "user" : "assistant", // 사용자 식별자
+        },
+      })));
     } catch (error) {
       console.error('Error fetching chat info:', error);
     }
   };
+  
+    // 서버로부터 메시지를 받았을 때 호출될 함수
+  const onMessageReceived = useCallback((newMessage) => {
+    // 새 메시지를 기존 메시지 목록에 추가
+    setMessages(prevMessages => [...prevMessages, {
+      _id: new Date().getTime(), // 새 메시지에 대한 임시 고유 식별자
+      text: newMessage.content, // 메시지 텍스트
+      createdAt: new Date(), // 현재 시각
+      user: {
+        _id: newMessage.sender === 'user' ? "user" : "assistant", // 메시지 보낸 사람 식별
+      }
+    }]);
+  }, []);
 
   useEffect(() => {
     fetchChatInfo();
-  }, [roomID]);
+  }, [starId]);
 
-  const { isConnected, sendMessage } = useSocket(clientID, starId);
+  const { isConnected, sendMessage } = useSocket(starId, onMessageReceived);
 
   const onSend = useCallback((newMessages = []) => {
     setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
     newMessages.forEach(message => {
-      const messageData = {
-        room_id: roomID,
-        user_id: clientID,
-        star_id: starId,
-        content: message.text,
-      };
+      const messageData = message.text
       if (isConnected) {
         sendMessage(messageData);
       } else {
         console.error("WebSocket is not connected");
       }
     });
-  }, [isConnected, sendMessage, roomID, clientID, starId]);
+  }, [isConnected, sendMessage]);
 
   // Render functions for customizing the chat bubbles and timestamps
   const renderBubble = props => (
@@ -78,7 +92,7 @@ function Chat({ route, navigation }) {
       <GiftedChat
         messages={messages}
         onSend={newMessages => onSend(newMessages)}
-        user={{ _id: clientID }}
+        user={{ _id: "user" }}
         renderBubble={renderBubble}
         renderTime={renderTime}
       />
