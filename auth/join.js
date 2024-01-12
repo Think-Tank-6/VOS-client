@@ -28,11 +28,9 @@ function Join({ navigation }) {
   // 이메일 중복 체크
   const checkEmail = async () => {
     try {
-<<<<<<< Updated upstream:component/join.js
+
       const response = await fetch(`${API_URL}/users/join/email-check`, {
-=======
-      const response = await fetch('http://192.168.0.96:8000/users/join/email-check', {
->>>>>>> Stashed changes:auth/join.js
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
