@@ -4,11 +4,10 @@ import { useFonts, Hurricane_400Regular } from '@expo-google-fonts/hurricane';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
-import Join from '../components/join';
 import { Alert } from 'react-native';
 
 
-const Login = ({ navigation }) => {
+const AdminLogin = ({ navigation }) => {
   // 상태 변수 정의
   const [user_id, setUser_Id] = useState('');
   const [password, setPassword] = useState('');
@@ -211,4 +210,4 @@ signupButtonText: {
 },
 });
 
-export default Login;
+export default AdminLogin;

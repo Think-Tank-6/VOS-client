@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 
-function Join({ navigation }) {
+function AdminJoin({ navigation }) {
   const [admin_id, setadmin_Id] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -184,4 +184,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Join;
+export default AdminJoin;
