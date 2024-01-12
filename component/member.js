@@ -1,68 +1,61 @@
-import React from 'react';
-import { View, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView,Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ImageBackground, Text } from 'react-native';
 
-// async function fetchUserInfo() {
-//     try {
-//       const response = await fetch('http://192.168.0.96:8000/users/');
-//       const json = await response.json();
-//       return json;
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   }
+// 사용자 정보를 불러오는 함수
+async function fetchUserInfo(token) {
+  try {
+    console.log('사용된 토큰:', token); // 토큰 출력
 
-function Member({ navigation }) {
-    // 사용자 정보를 상태로 관리합니다.
-    // const [userInfo, setUserInfo] = useState({
-    //   email: '',
-    //   name: '',
-    //   dateOfBirth: '',
-    //   phone: '',
-    //   credits: '',
-    // });
+    const response = await fetch('http://192.168.0.96:8000/mypage', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    const onPwupdatePress = () => {
-        navigation.navigate('pwupdate');
-    };  
-  
-    // useEffect(() => {
-    //   // 컴포넌트가 마운트될 때 사용자 정보를 불러옵니다.
-    //   fetchUserInfo().then(data => {
-    //     setUserInfo(data); // 가져온 데이터로 상태를 업데이트합니다.
-    //   });
-    // }, []);
-  
-    return (
-      <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.container}>
-            {/* 타이틀 이미지 */}
-            <Image source={require('../assets/img/title.png')} style={styles.titleImage}/>
-            
-            {/* 사용자 정보 텍스트 */}
-            {/* <Text style={styles.infoText}>이메일: {userInfo.email}</Text>
-            <Text style={styles.infoText}>이름: {userInfo.name}</Text>
-            <Text style={styles.infoText}>생년월일: {userInfo.dateOfBirth}</Text>
-            <Text style={styles.infoText}>전화번호: {userInfo.phone}</Text>
-            <Text style={styles.infoText}>크레딧: {userInfo.credits}</Text> */}
-            <Text style={styles.infoText}>이메일: </Text>
-            <Text style={styles.infoText}>이름: </Text>
-            <Text style={styles.infoText}>생년월일: </Text>
-            <Text style={styles.infoText}>전화번호: </Text>
-            <Text style={styles.infoText}>크레딧: </Text>
-            
-            {/* 별 보기 버튼 */}
-            <TouchableOpacity 
-                style={styles.addButtonContainer} 
-                onPress={onPwupdatePress}
-            >
-                <Text style={styles.addPwupdate}>비밀번호 변경</Text> 
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      </ImageBackground>
-    );
+    const json = await response.json();
+    return json;
+  } catch (error) {
+    console.error('사용자 정보 가져오기 에러:', error);
+    return {};
   }
+}
+
+// Member 컴포넌트 정의
+function Member({ route, navigation }) {
+  const token = route.params?.token;
+  const [userInfo, setUserInfo] = useState({
+    user_id: '',
+    name: '',
+    phone: '',
+    birth: '',
+    credits: '',
+  });
+
+  useEffect(() => {
+    const fetchAndSetUserInfo = async () => {
+      const data = await fetchUserInfo(token);
+      setUserInfo(data);
+    };
+
+    if (token) {
+      fetchAndSetUserInfo();
+    }
+  }, [token]);
+
+  return (
+    <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
+      <View style={styles.container}>
+        <Text style={styles.infoText}>이메일: {userInfo.user_id}</Text>
+        <Text style={styles.infoText}>이름: {userInfo.name}</Text>
+        <Text style={styles.infoText}>전화번호: {userInfo.phone}</Text>
+        <Text style={styles.infoText}>생년월일: {userInfo.birth}</Text>
+        <Text style={styles.infoText}>크레딧: {userInfo.credits}</Text>
+        {/* 여기에 추가적인 UI 요소나 로직을 구현할 수 있습니다 */}
+      </View>
+    </ImageBackground>
+  );
+}
 
 const styles = StyleSheet.create({
   wrapper: {

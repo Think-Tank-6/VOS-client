@@ -14,8 +14,6 @@ import Pwupdate from './component/pwupdate';
 import AdminLogin from './admin/components/adminLogin';
 import AdminJoin from './admin/components/adminJoin';
 
-
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -71,15 +69,16 @@ export default function App() {
           component={Pwupdate}
           options={{ headerShown: false }} // 여기에 추가
         />
+
         <Stack.Screen 
           name="adminLogin" 
           component={AdminLogin}
         />
-        
         <Stack.Screen 
           name="adminJoin" 
           component={AdminJoin}
         />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
