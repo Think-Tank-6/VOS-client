@@ -2,17 +2,17 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Main from './component/main';
-import Login from './component/login';
-import Join from './component/join';
+import Login from './auth/login';
+import Join from './auth/join';
 import StarList from './component/starList';
-import KakaoLogin from './component/kakao_login';
+import KakaoLogin from './auth/kakao_login';
 import Admin from './admin/navigation/admin';
 import UserDetail from './admin/components/userDetail';
 import Setting from './component/setting';
 import Mypage from './component/mypage'
 import Pwupdate from './component/pwupdate';
-import Login from './admin/components/login';
-import Join from './admin/components/join';
+import AdminLogin from './admin/components/adminLogin';
+import AdminJoin from './admin/components/adminJoin';
 
 
 
@@ -72,13 +72,13 @@ export default function App() {
           options={{ headerShown: false }} // 여기에 추가
         />
         <Stack.Screen 
-          name="lgoin" 
-          component={Login}
+          name="adminLogin" 
+          component={AdminLogin}
         />
         
         <Stack.Screen 
-          name="join" 
-          component={Join}
+          name="adminJoin" 
+          component={AdminJoin}
         />
       </Stack.Navigator>
     </NavigationContainer>

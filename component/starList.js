@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal
 import { StatusBar } from 'expo-status-bar';
 import Generate from './generate';
 import { API_URL } from '@env';
+import getAccessTokenFromHeader from '../hooks/getAccessTokenFromHeader';
+import { Hook } from "tapable";
 
 function StarList({ navigation }) {
     const [stars, setStars] = useState([]);
@@ -11,8 +13,8 @@ function StarList({ navigation }) {
     // Access Token (인증이 필요한 경우 사용)
     // 실제 앱에서는 로그인 후 받은 token을 사용해야 합니다.
     
-    const navigateToChat = (roomId) => {
-        navigation.navigate('Chat', { roomId });
+    const navigateToChat = (userId) => {
+        navigation.navigate('Chat', { userId });
     };
 
     useEffect(() => {

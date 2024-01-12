@@ -1,32 +1,15 @@
-import React, { useState,useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView, loggedInUserId } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
 
 function Login({ navigation }) {
-    const [user_id, setuser_Id] = useState('');
+    const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
-
-    useEffect(() => {
-        const fetchUserId = async () => {
-            try {
-                const userId = await AsyncStorage.getItem('userId');
-                if (userId) {
-                    setLoggedInUserId(userId);
-                } else {
-                    console.log("No userId found in AsyncStorage");
-                }
-            } catch (error) {
-                console.error('Error fetching user id from AsyncStorage:', error);
-            }
-        };
-    
-        fetchUserId();
-    }, [loggedInUserId]);
 
     const onLoginPress = async () => {
         const loginData = {
-            user_id: user_id,
+            user_id: userId,
             password: password,
         };
 
@@ -38,39 +21,30 @@ function Login({ navigation }) {
                 },
                 body: JSON.stringify(loginData),
             });
-    
+
             let jsonResponse = await response.json();
 
             if (response.ok && jsonResponse.access_token) {
                 await AsyncStorage.setItem('accessToken', jsonResponse.access_token);
-                // userId가 있는지 확인하고 저장합니다.
-                if (jsonResponse.userId) {
-                    await AsyncStorage.setItem('userId', jsonResponse.userId);
-                } else {
-                    console.log("No userId in response");
-                }
-
                 navigation.navigate('StarList');
             } else {
-                console.log('Login failed or accessToken is undefined:', jsonResponse);
+                console.log('Login failed:', jsonResponse.detail || 'No detail provided');
             }
         } catch (error) {
             console.error('Network error:', error);
         }
     };
-    // 회원가입 페이지 이동 처리 함수
+
     const onMemberPress = () => {
         navigation.navigate('Join');
     };
 
-    // 비밀번호 찾기 페이지 이동 처리 함수
     const onAddPress = () => {
-        navigation.navigate('mypage');
-    };  
+        navigation.navigate('PasswordRecovery'); // 수정 필요: 비밀번호 찾기 화면으로의 경로
+    };
 
-    // 카카오 로그인 처리 함수
     const onKakaoLoginPress = () => {
-        navigation.navigate('KakaoLogin'); // 'KakaoLogin'은 카카오 로그인을 처리하는 화면으로 이동
+        navigation.navigate('KakaoLogin');
     };
 
     return (
@@ -83,39 +57,26 @@ function Login({ navigation }) {
                     <Text style={styles.label}>이메일</Text>
                     <TextInput
                         style={styles.input}
-                        value={user_id}
-                        onChangeText={setuser_Id}
+                        value={userId}
+                        onChangeText={setUserId}
                     />
                     <Text style={styles.label}>비밀번호</Text>
                     <TextInput
                         style={styles.input}
                         value={password}
                         onChangeText={setPassword}
+                        secureTextEntry={true} // 비밀번호를 숨김
                     />
-
-                    <TouchableOpacity 
-                        style={styles.addButtonContainerPW} 
-                        onPress={onAddPress}
-                    >
-                        <Text style={styles.addText}>비밀번호찾기</Text> 
+                    <TouchableOpacity style={styles.addButtonContainerPW} onPress={onAddPress}>
+                        <Text style={styles.addText}>비밀번호 찾기</Text>
                     </TouchableOpacity>
-
-                    <TouchableOpacity 
-                        style={styles.addButtonContainer} 
-                        onPress={onLoginPress}
-                    >
-                        <Text style={styles.addLogin}>로그인</Text> 
+                    <TouchableOpacity style={styles.addButtonContainer} onPress={onLoginPress}>
+                        <Text style={styles.addLogin}>로그인</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
-                        style={styles.addButtonContainer} 
-                        onPress={onMemberPress}
-                    >
-                        <Text style={styles.addMember}>회원가입</Text> 
+                    <TouchableOpacity style={styles.addButtonContainer} onPress={onMemberPress}>
+                        <Text style={styles.addMember}>회원가입</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
-                        style={styles.kakaoButtonContainer} 
-                        onPress={onKakaoLoginPress}
-                    >
+                    <TouchableOpacity style={styles.kakaoButtonContainer} onPress={onKakaoLoginPress}>
                         <Text style={styles.kakaoButtonText}>카카오 로그인</Text>
                     </TouchableOpacity>
                 </View>
@@ -123,6 +84,7 @@ function Login({ navigation }) {
         </ImageBackground>
     );
 }
+
 
 const styles = StyleSheet.create({
     wrapper: {
