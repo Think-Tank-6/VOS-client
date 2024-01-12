@@ -8,13 +8,12 @@ function Setting({ navigation }) {
     const [accessToken, setAccessToken] = useState(null); // accessToken 상태 추가
 
     useEffect(() => {
-      // 로그인한 사용자의 아이디와 토큰을 가져오는 함수
       const getLoggedInUserInfo = async () => {
           try {
               const token = await AsyncStorage.getItem('accessToken');
               if (token) {
-                  setAccessToken(token); // 토큰 상태 업데이트
-                  console.log('저장된 토큰:', token); // 콘솔에 토큰 출력
+                  setAccessToken(token);
+                  console.log('저장된 토큰:', token);
               }
           } catch (error) {
               console.error('Error fetching user info', error);
