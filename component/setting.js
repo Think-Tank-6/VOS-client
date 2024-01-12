@@ -5,45 +5,49 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 function Setting({ navigation }) {
     const [selectedTab, setSelectedTab] = useState('MyPage');
     const [loggedInUserId, setLoggedInUserId] = useState(null);
+    const [accessToken, setAccessToken] = useState(null); // accessToken 상태 추가
+
     useEffect(() => {
-        // 로그인한 사용자의 아이디를 가져오는 함수
-        const getLoggedInUserId = async () => {
+      // 로그인한 사용자의 아이디와 토큰을 가져오는 함수
+      const getLoggedInUserInfo = async () => {
           try {
-            const userId = await AsyncStorage.getItem('userId');
-            if (userId) {
-              setLoggedInUserId(userId); // 아이디 상태 업데이트
-            }
+              const token = await AsyncStorage.getItem('accessToken');
+              if (token) {
+                  setAccessToken(token); // 토큰 상태 업데이트
+                  console.log('저장된 토큰:', token); // 콘솔에 토큰 출력
+              }
           } catch (error) {
-            console.error('Error fetching user id', error);
+              console.error('Error fetching user info', error);
           }
-        };
-    
-        getLoggedInUserId();
-      }, []);
-
-      const navigateToTab = (tabName) => {
-        setSelectedTab(tabName);
-        navigation.navigate(tabName); // 실제 네비게이션을 구현할 때는 이 코드를 활성화합니다.
       };
+  
+      getLoggedInUserInfo();
+  }, []);
 
-  return (
-    <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
-          <Image source={require('../assets/img/title.png')} style={styles.titleImage}/>
-          <Text style={styles.userIdText}>로그인한 사용자: {loggedInUserId}</Text>
-          
-          {/* Tab Navigation */}
-          <View style={styles.tabContainer}>
-          <TouchableOpacity style={styles.tab} onPress={() => navigateToTab('mypage')}>
-                <Text style={styles.tabText}>마이페이지</Text>
-        </TouchableOpacity>
-          </View>
-        </View>
-      </SafeAreaView>
-    </ImageBackground>
-  );
+    const navigateToTab = (tabName) => {
+      navigation.navigate(tabName, { token: accessToken });
+    };
+
+    return (
+        <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.container}>
+                    <Image source={require('../assets/img/title.png')} style={styles.titleImage}/>
+                    <Text style={styles.userIdText}>로그인한 사용자: {loggedInUserId}</Text>
+                    <Text style={styles.userIdText}>토큰: {accessToken ? '저장됨' : '저장되지 않음'}</Text>
+                    
+                    {/* Tab Navigation */}
+                    <View style={styles.tabContainer}>
+                        <TouchableOpacity style={styles.tab} onPress={() => navigateToTab('mypage')}>
+                            <Text style={styles.tabText}>마이페이지</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </SafeAreaView>
+        </ImageBackground>
+    );
 }
+
 
 const styles = StyleSheet.create({
   wrapper: {
