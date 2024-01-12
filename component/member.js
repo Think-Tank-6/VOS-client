@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ImageBackground, Text } from 'react-native';
+import { API_URL } from '@env';
 
 // 사용자 정보를 불러오는 함수
 async function fetchUserInfo(token) {
   try {
     console.log('사용된 토큰:', token); // 토큰 출력
 
-    const response = await fetch('http://192.168.0.96:8000/mypage', {
+    const response = await fetch(`${API_URL}/mypage`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -29,7 +30,7 @@ function Member({ route, navigation }) {
     name: '',
     phone: '',
     birth: '',
-    credits: '',
+    credit: '',
   });
 
   useEffect(() => {
@@ -50,7 +51,7 @@ function Member({ route, navigation }) {
         <Text style={styles.infoText}>이름: {userInfo.name}</Text>
         <Text style={styles.infoText}>전화번호: {userInfo.phone}</Text>
         <Text style={styles.infoText}>생년월일: {userInfo.birth}</Text>
-        <Text style={styles.infoText}>크레딧: {userInfo.credits}</Text>
+        <Text style={styles.infoText}>크레딧: {userInfo.credit}</Text>
         {/* 여기에 추가적인 UI 요소나 로직을 구현할 수 있습니다 */}
       </View>
     </ImageBackground>

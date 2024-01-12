@@ -1,32 +1,52 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
+import { API_URL } from '@env';
 
-function Pwupdate({ navigation }) {
+function Pwupdate({ route, navigation }) {
+    const token = route.params?.token;
     const [password, setPassword] = useState('');
-    const [newpassword, setNewpassword] = useState('');
-    const [newpasswordcheck, setNewpasswordcheck] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [newPasswordCheck, setNewPasswordCheck] = useState('');
     const [passwordError, setPasswordError] = useState('');
-    const [newpasswordcheckError, setNewpasswordcheckError] = useState('');
+    const [newPasswordCheckError, setNewPasswordCheckError] = useState('');
 
     const handleSubmit = async () => {
-        if (newpassword !== newpasswordcheck) {
-            setNewpasswordcheckError('비밀번호가 다릅니다.');
-            // 비밀번호가 다를 경우, 여기서 함수를 종료합니다.
+        if (newPassword !== newPasswordCheck) {
+            setNewPasswordCheckError('새 비밀번호가 일치하지 않습니다.');
             return;
         }
-        // 비밀번호가 일치하면 이곳에서 서버로 변경 요청을 보내는 로직을 추가합니다.
-        // 예: API 호출 등
-        setPasswordError(''); // 에러 메시지를 초기화합니다.
-        setNewpasswordcheckError(''); // 에러 메시지를 초기화합니다.
-        // 변경이 성공했다면 사용자에게 알림을 주거나 다른 화면으로 이동하는 로직을 추가합니다.
+
+        try {
+            const response = await fetch(`${API_URL}/modify-password`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    currentPassword: password,
+                    newPassword: newPassword,
+                }),
+            });
+
+            const json = await response.json();
+
+            if (json.success) {
+                // 변경 성공 처리
+            } else {
+                // 변경 실패 처리
+            }
+        } catch (error) {
+            console.error('비밀번호 변경 요청 에러:', error);
+        }
+
+        setPasswordError('');
+        setNewPasswordCheckError('');
     };
 
     return (
         <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
             <SafeAreaView style={styles.safeArea}>
-                <View style={styles.container}>
-                    <Image source={require('../assets/img/title.png')} style={styles.titleImage}/>
-                </View>
                 <View style={styles.formContainer}>
                     <Text style={styles.label}>현재 비밀번호</Text>
                     <TextInput
@@ -38,19 +58,19 @@ function Pwupdate({ navigation }) {
                     <Text style={styles.label}>변경할 비밀번호</Text>
                     <TextInput
                         style={styles.input}
-                        value={newpassword}
-                        onChangeText={setNewpassword}
+                        value={newPassword}
+                        onChangeText={setNewPassword}
                         secureTextEntry // 비밀번호를 숨김 처리
                     />
                     <Text style={styles.label}>변경할 비밀번호 확인</Text>
                     <TextInput
                         style={styles.input}
-                        value={newpasswordcheck}
-                        onChangeText={setNewpasswordcheck}
+                        value={newPasswordCheck}
+                        onChangeText={setNewPasswordCheck}
                         secureTextEntry // 비밀번호를 숨김 처리
                     />
                     {/* 에러 메시지 표시 */}
-                    {newpasswordcheckError ? <Text style={styles.errorText}>{newpasswordcheckError}</Text> : null}
+                    {newPasswordCheckError ? <Text style={styles.errorText}>{newPasswordCheckError}</Text> : null}
                     <Button title="변경 완료" onPress={handleSubmit} />
                 </View>
             </SafeAreaView>
@@ -97,9 +117,9 @@ const styles = StyleSheet.create({
       color : 'white'
     },
     errorText: {
-        color: 'red',
-        marginBottom: 10,
-      },
+      color: 'red',
+      marginBottom: 10,
+  },
     inputContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
