@@ -4,11 +4,13 @@ import { View, StyleSheet, ImageBackground, KeyboardAvoidingView, Image, Platfor
 import { StatusBar } from 'expo-status-bar';
 import useSocket from '../hooks/useSocket';
 import { API_URL } from '@env';
+import getAccessTokenFromHeader from '../hooks/getAccessTokenFromHeader';
 
 function Chat({ route }) {
   const [messages, setMessages] = useState([]);
   const { star_id } = route.params; // Extract star_id from navigation parameters
   const [starId, setStarId] = useState(star_id); // Use the passed star_id
+  const [starImg, setStarImg] = useState(star_id); // Use the passed star_id
 
   // Fetch initial chat messages
   const fetchChatInfo = async () => {
@@ -48,8 +50,37 @@ function Chat({ route }) {
   }, []);
   
   useEffect(() => {
+    const fetchAccessTokenAndStars = async () => {
+        const accessToken = await getAccessTokenFromHeader();
+        if (accessToken) {
+            fetchStars(accessToken);
+        } else {
+            console.log('No access token found');
+            navigation.navigate('Login');
+        }
+    };
+
+    fetchAccessTokenAndStars();
     fetchChatInfo();
   }, [starId]);
+
+  const fetchStars = async (accessToken) => {
+      try {
+          const response = await fetch(`${API_URL}/stars`, {
+              method: 'GET',
+              headers: {
+                  'Authorization': `Bearer ${accessToken}`,
+                  'Content-Type': 'application/json'
+              }
+          });
+          const json = await response.json();
+          const matchedStar = json.stars.find((s) => s.star_id === starId); if (matchedStar) { 
+            setStarImg(matchedStar.image);
+          }
+      } catch (error) {
+          console.error(`Error fetching stars: ${error.message}`);
+      }
+  };
 
   const { isConnected, sendMessage, receiveMessage } = useSocket(starId, onMessageReceived);
 
@@ -90,6 +121,15 @@ function Chat({ route }) {
     <Time {...props} />
   );
 
+  const renderAvatar = (props) => (
+    props.currentMessage.user._id === 'assistant' ? (
+        <Image
+            source={{ uri: starImg || 'https://voice-of-the-star.s3.ap-northeast-2.amazonaws.com/casey-horner-RmoWqDCqN2E-unsplash.jpg' }}
+            style={{ width: 36, height: 36, borderRadius: 18 }}
+        />
+    ) : null
+  )
+
   return (
     <ImageBackground style={styles.wrapper} source={require('../assets/img/background.png')}>
       <StatusBar style='light' />
@@ -102,7 +142,7 @@ function Chat({ route }) {
         user={{ _id: 'user' || 'assistant'}}
         renderBubble={renderBubble}
         renderTime={renderTime}
-        
+        renderAvatar={renderAvatar}
       />
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} />
     </ImageBackground>
