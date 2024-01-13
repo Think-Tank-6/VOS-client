@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import { WS_URL } from '@env';
 
-const useSocket = (clientID, roomID, onMessageReceived) => {
+const useSocket = (starID, externalOnMessageReceived) => {
   const [ws, setWs] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const websocket = new WebSocket(`ws://192.168.0.69:8000/chat/${clientID}/${roomID}`);
+    const websocket = new WebSocket(`${WS_URL}/chat/${starID}`);
     setWs(websocket);
 
     websocket.onopen = () => {
@@ -16,29 +17,31 @@ const useSocket = (clientID, roomID, onMessageReceived) => {
     websocket.onmessage = (event) => {
       // 서버로부터 메시지를 받으면 onMessageReceived 콜백을 호출합니다.
       const message = JSON.parse(event.data);
-      onMessageReceived(message);
+      externalOnMessageReceived(message);
     };
 
-    websocket.onerror = () => {
-      console.error('WebSocket error occurred');
-    };
-
-    websocket.onclose = () => {
+    websocket.onerror = (error) => {
+      console.error('WebSocket error occurred:', error);
       setIsConnected(false);
-      console.log('Disconnected from the WebSocket server');
-    };
+  };
+  
+  websocket.onclose = (event) => {
+      console.log('Disconnected from the WebSocket server:', event);
+      setIsConnected(false);
+  };
 
-    return () => {
+  return () => {
       websocket.close();
-    };
-  }, [clientID, roomID, onMessageReceived]);
+  };
+  }, [starID, externalOnMessageReceived]);
 
-  const sendMessage = (message) => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(message));
-    } else {
-      console.error('WebSocket is not open');
-    }
+  const sendMessage = (messageContent) => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+          const message = { content: messageContent };
+          ws.send(JSON.stringify(message));
+      } else {
+          console.error('WebSocket is not open');
+      }
   };
 
   return { ws, isConnected, sendMessage };

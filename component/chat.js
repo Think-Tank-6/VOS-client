@@ -5,46 +5,67 @@ import { StatusBar } from 'expo-status-bar';
 import useSocket from '../hooks/useSocket';
 import { API_URL } from '@env';
 
-function Chat({ route, navigation }) {
+function Chat({ route }) {
   const [messages, setMessages] = useState([]);
-  const { roomID } = route.params; // Assuming roomID is passed as a route parameter
-  const [clientID, setClientID] = useState('YourClientID'); // Set this to the actual clientID
-  const [starId, setStarId] = useState('YourStarID'); // Set this to the actual starId
+  const { star_id } = route.params; // Extract star_id from navigation parameters
+  const [starId, setStarId] = useState(star_id); // Use the passed star_id
 
   // Fetch initial chat messages
   const fetchChatInfo = async () => {
     try {
-      // Fetch existing messages for the room
-      const messagesResponse = await fetch(`${API_URL}/chat/${roomID}/messages`);
+      const messagesResponse = await fetch(`${API_URL}/chat/${star_id}/messages`);
       const messagesData = await messagesResponse.json();
-      setMessages(messagesData.map(m => ({ ...m, createdAt: new Date(m.createdAt) })));
+      const formattedMessages = messagesData.map(m => ({
+        _id: m._id || new Date(m.created_at).getTime(),
+        text: typeof m.content === 'object' ? m.content.text : m.content, // 'content'가 객체면 'text' 필드 사용
+        createdAt: new Date(m.created_at),
+        user: {
+          _id: m.sender === 'user' ? "user" : "assistant",
+        },
+      }));
+      setMessages(formattedMessages);
     } catch (error) {
       console.error('Error fetching chat info:', error);
     }
   };
-
+  
+  // 서버로부터 메시지를 받았을 때 호출될 함수
+  const onMessageReceived = useCallback((newMessage) => {
+    console.log('New message received:', newMessage); // Add log for debugging
+  
+    // 메시지 데이터가 올바른 형식인지 검증하고 변환
+    const formattedMessage = {
+      _id: newMessage._id || Math.round(Math.random() * 1000000), // 랜덤한 ID 생성 또는 백엔드에서 받은 _id 사용
+      text: newMessage.content,
+      createdAt: new Date(),
+      user: {
+        _id: newMessage.sender === 'user' ? 'user' : 'assistant',// 'user'는 1, 'assistant'는 2로 가정
+        name: newMessage.sender === 'user' ? 'User' : 'Assistant',
+      },
+    };
+  
+    setMessages(previousMessages => GiftedChat.append(previousMessages, formattedMessage));
+  }, []);
+  
   useEffect(() => {
     fetchChatInfo();
-  }, [roomID]);
+  }, [starId]);
 
-  const { isConnected, sendMessage } = useSocket(clientID, starId);
+  const { isConnected, sendMessage, receiveMessage } = useSocket(starId, onMessageReceived);
 
   const onSend = useCallback((newMessages = []) => {
-    setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
     newMessages.forEach(message => {
-      const messageData = {
-        room_id: roomID,
-        user_id: clientID,
-        star_id: starId,
-        content: message.text,
-      };
+      console.log('Sending message:', message); // Add log for debugging
+      const messageData = message.text; // Ensure the format matches the backend expectation
       if (isConnected) {
         sendMessage(messageData);
       } else {
         console.error("WebSocket is not connected");
       }
     });
-  }, [isConnected, sendMessage, roomID, clientID, starId]);
+    setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
+  }, [isConnected, sendMessage]);
+
 
   // Render functions for customizing the chat bubbles and timestamps
   const renderBubble = props => (
@@ -78,9 +99,10 @@ function Chat({ route, navigation }) {
       <GiftedChat
         messages={messages}
         onSend={newMessages => onSend(newMessages)}
-        user={{ _id: clientID }}
+        user={{ _id: 'user' || 'assistant'}}
         renderBubble={renderBubble}
         renderTime={renderTime}
+        
       />
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} />
     </ImageBackground>
