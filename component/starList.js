@@ -69,8 +69,12 @@ function StarList({ navigation }) {
                 throw new Error(`Server responded with status: ${response.status}`);
             }
 
-            const json = await response.json();
-            return json.message || "메시지가 없습니다.";
+            const lastMessageData = await response.json();
+            if (lastMessageData && lastMessageData.content) {
+                return lastMessageData.content;
+            } else {
+                return "메시지가 없습니다."; // 서버 응답에 content가 없는 경우
+            }
         } catch (error) {
             console.error(`Error fetching last message for star ${starId}: ${error.message}`);
             return "메시지를 가져올 수 없습니다.";
