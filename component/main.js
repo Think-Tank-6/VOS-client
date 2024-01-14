@@ -1,26 +1,55 @@
-import React from "react";
-import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity,SafeAreaView } from 'react-native';
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Main({ navigation }) {
+
+    useEffect(() => {
+        let timer;
+
+        const checkToken = async () => {
+            try {
+                const token = await AsyncStorage.getItem('userToken');
+                if (token) {
+                    navigation.navigate('StarList'); // 토큰이 있으면 StarList 페이지로 이동
+                    clearTimeout(timer); // 타이머 취소
+                    return;
+                }
+                // 토큰이 없으면 로그인 페이지로 이동하는 타이머 설정
+                timer = setTimeout(() => {
+                    navigation.navigate('Login');
+                }, 3000);
+            } catch (error) {
+                console.error('Error reading token:', error);
+            }
+        };
+
+        checkToken();
+
+        return () => {
+            if (timer) clearTimeout(timer); // 컴포넌트가 언마운트될 때 타이머 제거
+        };
+    }, [navigation]);
+
     const onAddPress = () => {
-      navigation.navigate('Login');
+        navigation.navigate('Login');
     };
 
     return (
-      <ImageBackground source={require('../assets/img/main.png')} style={styles.wrapper} resizeMode="cover">
-        <SafeAreaView style={styles.safeArea}>
-            <View style={styles.topImageContainer}>
-            <Image source={require('../assets/img/title.png')} style={styles.centerImage}/>
-            </View>
+        <ImageBackground source={require('../assets/img/main.png')} style={styles.wrapper} resizeMode="cover">
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.topImageContainer}>
+                    <Image source={require('../assets/img/title.png')} style={styles.centerImage} />
+                </View>
 
-            <TouchableOpacity 
-                style={styles.addButtonContainer} 
-                onPress={onAddPress}
-            >
-                <Text style={styles.addText}>로그인</Text> 
-            </TouchableOpacity>
-        </SafeAreaView>
-      </ImageBackground>
+                <TouchableOpacity
+                    style={styles.addButtonContainer}
+                    onPress={onAddPress}
+                >
+                    <Text style={styles.addText}>로그인</Text>
+                </TouchableOpacity>
+            </SafeAreaView>
+        </ImageBackground>
     );
 }
 
@@ -53,7 +82,7 @@ const styles = StyleSheet.create({
         // alignItems와 justifyContent는 여기서 필요하지 않습니다.
         marginTop: 30,
     },
-    
+
 });
 
 export default Main;

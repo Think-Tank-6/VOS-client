@@ -10,7 +10,10 @@ import {
   ScrollView,
   Button,
   Alert,
-  Switch
+  Switch,
+  Modal,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import { API_URL } from '@env';
 
@@ -20,15 +23,25 @@ function Join({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [birth, setBirth] = useState('');
+  let [phone, setPhone] = useState('');
+  let [birth, setBirth] = useState('');
   const [policy_agreement_flag, setpolicy_agreement_flag] = useState(false);
   const [isEmailChecked, setIsEmailChecked] = useState(false);
+  const [emailPrefix, setEmailPrefix] = useState('');
+  const [emailDomain, setEmailDomain] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [customDomain, setCustomDomain] = useState('');
+
+  const handleCustomDomainSubmit = () => {
+    setEmailDomain(customDomain);
+    setModalVisible(false);
+  };
 
   // 이메일 중복 체크
   const checkEmail = async () => {
     try {
-
+      const finalEmail = `${emailPrefix}@${emailDomain}`;
+      setuser_Id(finalEmail);
       const response = await fetch(`${API_URL}/users/join/email-check`, {
 
         method: 'POST',
@@ -39,7 +52,7 @@ function Join({ navigation }) {
           input_email: user_id, // 이메일 필드의 값을 사용
         }),
       });
-  
+
       const jsonResponse = await response.json(); // 응답을 JSON으로 변환
       if (jsonResponse.status === "available") {
         setIsEmailChecked(true); // 이메일이 사용 가능하면 상태 업데이트
@@ -53,10 +66,22 @@ function Join({ navigation }) {
       Alert.alert("네트워크 오류", error.toString());
     }
   };
+  const handleCheckEmail = () => {
+    if (!emailPrefix || !emailDomain) {
+      Alert.alert("경고", "아이디와 이메일 도메인을 모두 입력해주세요.");
+      return;
+    }
+
+    // 이메일 접두사와 도메인이 모두 입력된 경우, 이메일 중복 체크 진행
+    checkEmail();
+  };
+
 
   const isSignupDisabled = !isEmailChecked || !user_id || !password || !confirmPassword || !name || !phone || !birth || !policy_agreement_flag;
-// 비밀번호 체크
+  // 비밀번호 체크
   const handleSubmit = async () => {
+    const finalEmail = `${emailPrefix}@${emailDomain}`;
+    setuser_Id(finalEmail);
     if (password !== confirmPassword) {
       setPasswordError('비밀번호가 다릅니다.');
       return; // 비밀번호가 다를 경우, 여기서 함수를 종료합니다.
@@ -67,7 +92,11 @@ function Join({ navigation }) {
       return;
     }
 
+    birth = birth.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+    phone = phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+
     setPasswordError('');
+
 
     try {
       const response = await fetch(`${API_URL}/users/join`, {
@@ -76,7 +105,7 @@ function Join({ navigation }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id,
+          user_id: finalEmail,
           password,
           name,
           phone,
@@ -86,8 +115,6 @@ function Join({ navigation }) {
         }),
       });
 
-      
-    
       if (response.ok) {
         // 회원가입 성공 시
         Alert.alert("회원가입 성공", "회원가입이 완료되었습니다.");
@@ -105,74 +132,113 @@ function Join({ navigation }) {
       Alert.alert("네트워크 오류", error.toString());
     }
   };
+  const selectDomain = (domain) => {
+    setEmailDomain(domain);
+    setModalVisible(false);
+  };
 
   return (
     <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
       <View style={styles.topImageContainer}>
-          <Image source={require('../assets/img/title.png')} style={styles.centerImage}/>
+        <Image source={require('../assets/img/title.png')} style={styles.centerImage} />
       </View>
       <ScrollView style={styles.scrollView}>
-      <View style={styles.container}>
-        <Text style={styles.label}>이메일</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            value={user_id}
-            onChangeText={setuser_Id}
-          />
-          <TouchableOpacity style={styles.button} onPress={checkEmail}>
-            <Text>중복확인</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.label}>비밀번호</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={true}
-        />
-        
-        <Text style={styles.label}>비밀번호확인</Text>
-        <TextInput
-          style={styles.input}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry={true} // 비밀번호 숨김 처리
-        />
-        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-
-        <Text style={styles.label}>이름</Text>
-        <TextInput
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-        />
-
-        <Text style={styles.label}>전화번호</Text>
-        <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          value={phone}
-          onChangeText={setPhone}
-        />
-        
-        <TouchableOpacity
-            style={styles.button}
-            onPress={() => {/* 인증 로직 */}}
-          >
-            <Text>인증</Text>
-          </TouchableOpacity>
+        <View style={styles.container}>
+          <Text style={styles.label}>아이디</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={emailPrefix}
+              onChangeText={setEmailPrefix}
+              placeholder="아이디 입력"
+              keyboardType="email-address"
+            />
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => setModalVisible(true)}
+            >
+              <Text style={styles.buttonText}>
+                {emailDomain ? emailDomain : '이메일 선택'}
+              </Text>
+            </TouchableOpacity>
           </View>
 
-        <Text style={styles.label}>생년월일</Text>
-        <TextInput
-          style={styles.input}
-          value={birth}
-          onChangeText={setBirth}
-        />
-        {/* 체크박스와 동의 텍스트 */}
-        <View style={styles.checkboxContainer}>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              style={styles.centeredView}
+            >
+              <View style={styles.modalView}>
+                <TextInput
+                  style={styles.input}
+                  value={customDomain}
+                  onChangeText={setCustomDomain}
+                  placeholder="직접 도메인 입력"
+                  keyboardType="email-address"
+                />
+                <Button title="도메인 적용(직접입력한도메인)" onPress={handleCustomDomainSubmit} />
+                <Button title="naver.com" onPress={() => selectDomain('naver.com')} />
+                <Button title="daum.net" onPress={() => selectDomain('daum.net')} />
+                <Button title="gmail.com" onPress={() => selectDomain('gmail.com')} />
+              </View>
+            </KeyboardAvoidingView>
+          </Modal>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleCheckEmail}
+          >
+            <Text>중복확인</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.label}>비밀번호</Text>
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={true}
+          />
+
+          <Text style={styles.label}>비밀번호 확인</Text>
+          <TextInput
+            style={styles.input}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={true}
+          />
+          {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+
+          <Text style={styles.label}>이름</Text>
+          <TextInput
+            style={styles.input}
+            value={name}
+            onChangeText={setName}
+          />
+
+          <Text style={styles.label}>전화번호</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={phone}
+              onChangeText={setPhone}
+            />
+          </View>
+
+          <Text style={styles.label}>생년월일 (EX:YYYYMMDD) 로 입력하세요</Text>
+          <TextInput
+            style={styles.input}
+            value={birth}
+            placeholder="YYYYMMDD"
+            placeholderTextColor="white"
+            onChangeText={setBirth}
+          />
+
+          <View style={styles.checkboxContainer}>
             <Switch
               value={policy_agreement_flag}
               onValueChange={setpolicy_agreement_flag}
@@ -183,83 +249,123 @@ function Join({ navigation }) {
           </View>
 
           <Button title="회원가입" onPress={handleSubmit} disabled={isSignupDisabled} />
-      </View>
+        </View>
       </ScrollView>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-    wrapper: {
-        flex: 1,
+  wrapper: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  container: {
+    justifyContent: 'flex-start',
+    padding: 20,
+  },
+  topImageContainer: {
+    alignItems: 'center', // 자식 요소를 가로 축의 가운데로 정렬합니다.
+    justifyContent: 'center',
+    height: 100,
+  },
+  centerImage: {
+    width: '100%', // 이미지의 가로 크기를 조정합니다.
+    height: '100%', // 이미지의 세로 크기를 조정합니다. 원하는 비율로 조정하세요.
+    resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
+    marginTop: 20,
+  },
+  formContainer: { // 중앙 정렬을 위한 새로운 스타일
+    flex: 2, // flex 값을 조정하여 화면에 맞게 크기를 조절할 수 있습니다.
+    width: '80%', // 이 부분은 부모 뷰의 가로 크기의 80%를 차지하게 합니다.
+    alignSelf: 'center', // 부모 뷰의 중앙에 위치하게 합니다.
+  },
+  scrollView: {
+    flex: 1,
+  },
+  label: {
+    fontSize: 16,
+    marginTop: 10,
+    color: 'white'
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    marginRight: 10,
+    padding: 10,
+    borderRadius: 5,
+    color: 'white'
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginTop: 5,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  button: {
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    marginLeft: 10, // TextInput과의 간격
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  checkboxText: {
+    marginLeft: 8,
+    color: 'white',
+  },
+  selectedDomain: {
+    color: 'white',
+    fontSize: 16,
+    marginTop: 10
+  },
+  selectedDomainText: {
+    color: 'white',
+    fontSize: 16,
+    marginTop: 10
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  modalView: {
+    width: '90%', // 모달의 가로 크기를 조절
+    height: '50%', // 모달의 세로 크기를 조절
+    backgroundColor: 'black',
+    borderRadius: 20,
+    padding: 20, // 내부 패딩을 조절하여 내용물의 크기를 조절
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
-    safeArea: {
-        flex: 1,
-    },
-    container: {
-      justifyContent: 'flex-start',
-      padding: 20,
-    },
-    topImageContainer: {
-      alignItems: 'center', // 자식 요소를 가로 축의 가운데로 정렬합니다.
-      justifyContent: 'center', 
-      height: 100,
-    },
-    centerImage: {
-      width: '100%', // 이미지의 가로 크기를 조정합니다.
-      height: '100%', // 이미지의 세로 크기를 조정합니다. 원하는 비율로 조정하세요.
-      resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
-      marginTop: 20,
-    },
-    formContainer: { // 중앙 정렬을 위한 새로운 스타일
-      flex: 2, // flex 값을 조정하여 화면에 맞게 크기를 조절할 수 있습니다.
-      width: '80%', // 이 부분은 부모 뷰의 가로 크기의 80%를 차지하게 합니다.
-      alignSelf: 'center', // 부모 뷰의 중앙에 위치하게 합니다.
-    },
-    scrollView: {
-      flex: 1,
-    },
-    label: {
-      fontSize: 16,
-      marginTop: 10,
-      color : 'white'
-    },
-    input: {
-      flex:1,
-      height: 40,
-      borderColor: 'gray',
-      borderWidth: 1,
-      marginBottom: 10,
-      marginRight: 10,
-      padding: 10,
-      borderRadius: 5,
-      color : 'white'
-    },
-    errorText: {
-      color: 'red',
-      fontSize: 14,
-      marginTop: 5,
-    },
-    inputContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    button: {
-      padding: 10,
-      backgroundColor: 'white',
-      borderRadius: 5,
-      marginLeft: 10, // TextInput과의 간격
-    },
-    checkboxContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginTop: 10,
-    },
-    checkboxText: {
-      marginLeft: 8,
-      color: 'white',
-    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    alignSelf: 'center',
+    justifyContent: 'center',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
+  },
 });
 
 export default Join;

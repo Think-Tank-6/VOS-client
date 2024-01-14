@@ -5,7 +5,6 @@ import Main from './component/main';
 import Login from './auth/login';
 import Join from './auth/join';
 import StarList from './component/starList';
-import Chat from './component/chat';
 import KakaoLogin from './auth/kakao_login';
 import Admin from './admin/navigation/admin';
 import UserDetail from './admin/components/userDetail';
@@ -14,6 +13,7 @@ import Mypage from './component/mypage'
 import Pwupdate from './component/pwupdate';
 import AdminLogin from './admin/components/adminLogin';
 import AdminJoin from './admin/components/adminJoin';
+import Chat from './component/chat';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,11 +41,6 @@ export default function App() {
           component={StarList}
           options={{ headerShown: false }} // 여기에 추가
         />
-        <Stack.Screen 
-          name="Chat" 
-          component={Chat} 
-          options={{ headerShown: false }} 
-        />
         <Stack.Screen
           name="KakaoLogin"
           component={KakaoLogin}
@@ -59,6 +54,11 @@ export default function App() {
         <Stack.Screen 
           name="UserDetail" 
           component={UserDetail}
+        />
+        <Stack.Screen 
+          name="Chat" 
+          component={Chat} 
+          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="setting"

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
 
@@ -28,7 +28,12 @@ function Login({ navigation }) {
                 await AsyncStorage.setItem('accessToken', jsonResponse.access_token);
                 navigation.navigate('StarList');
             } else {
-                console.log('Login failed:', jsonResponse.detail || 'No detail provided');
+                if (response.status === 403) {
+                    Alert.alert("로그인 실패", jsonResponse.detail || "탈퇴한 회원입니다");
+                } else {
+                    // 그 외의 오류 메시지를 Alert.alert를 사용하여 표시
+                    Alert.alert("로그인 실패", jsonResponse.detail || '로그인에 실패했습니다.');
+                }
             }
         } catch (error) {
             console.error('Network error:', error);

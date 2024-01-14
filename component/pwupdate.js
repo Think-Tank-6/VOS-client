@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Alert, SafeAreaView } from 'react-native';
 import { API_URL } from '@env';
 
 function Pwupdate({ route, navigation }) {
@@ -7,41 +7,41 @@ function Pwupdate({ route, navigation }) {
     const [password, setPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [newPasswordCheck, setNewPasswordCheck] = useState('');
-    const [passwordError, setPasswordError] = useState('');
-    const [newPasswordCheckError, setNewPasswordCheckError] = useState('');
+    const [error, setError] = useState('');
 
     const handleSubmit = async () => {
         if (newPassword !== newPasswordCheck) {
-            setNewPasswordCheckError('새 비밀번호가 일치하지 않습니다.');
+            setError('새 비밀번호가 일치하지 않습니다.');
             return;
         }
-
+    
         try {
-            const response = await fetch(`${API_URL}/modify-password`, {
+            const response = await fetch(`${API_URL}/mypage/modify-password`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    currentPassword: password,
-                    newPassword: newPassword,
+                    current_password: password,
+                    new_password: newPassword, 
                 }),
             });
-
-            const json = await response.json();
-
-            if (json.success) {
-                // 변경 성공 처리
+    
+            const json = await response.json(); // 한 번만 호출
+            if (response.ok) {
+                Alert.alert("성공",
+                "비밀번호가 변경되었습니다.",
+                [{ text: "OK", onPress: () => navigation.navigate('Login') }]
+                );
+                navigation.goBack();
             } else {
-                // 변경 실패 처리
+                setError(json.message || '비밀번호 변경에 실패했습니다.');
             }
         } catch (error) {
+            setError('네트워크 오류가 발생했습니다.');
             console.error('비밀번호 변경 요청 에러:', error);
         }
-
-        setPasswordError('');
-        setNewPasswordCheckError('');
     };
 
     return (
@@ -70,7 +70,7 @@ function Pwupdate({ route, navigation }) {
                         secureTextEntry // 비밀번호를 숨김 처리
                     />
                     {/* 에러 메시지 표시 */}
-                    {newPasswordCheckError ? <Text style={styles.errorText}>{newPasswordCheckError}</Text> : null}
+                    {error ? <Text style={styles.errorText}>{error}</Text> : null}
                     <Button title="변경 완료" onPress={handleSubmit} />
                 </View>
             </SafeAreaView>
@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
       flex: 2, // flex 값을 조정하여 화면에 맞게 크기를 조절할 수 있습니다.
       width: '80%', // 이 부분은 부모 뷰의 가로 크기의 80%를 차지하게 합니다.
       alignSelf: 'center', // 부모 뷰의 중앙에 위치하게 합니다.
+      justifyContent: 'center',
     },
     label: {
       fontSize: 16,
@@ -106,16 +107,14 @@ const styles = StyleSheet.create({
       color : 'white'
     },
     input: {
-      flex:1,
-      height: 40,
-      borderColor: 'gray',
-      borderWidth: 1,
-      marginBottom: 10,
-      marginRight: 10,
-      padding: 10,
-      borderRadius: 5,
-      color : 'white'
-    },
+        height: 40,
+        borderColor: 'white',
+        borderWidth: 1,
+        marginBottom: 10,
+        padding: 10,
+        borderRadius: 5,
+        color : 'white',
+      },
     errorText: {
       color: 'red',
       marginBottom: 10,

@@ -32,8 +32,6 @@ function Setting({ navigation }) {
             <SafeAreaView style={styles.safeArea}>
                 <View style={styles.container}>
                     <Image source={require('../assets/img/title.png')} style={styles.titleImage}/>
-                    <Text style={styles.userIdText}>로그인한 사용자: {loggedInUserId}</Text>
-                    <Text style={styles.userIdText}>토큰: {accessToken ? '저장됨' : '저장되지 않음'}</Text>
                     
                     {/* Tab Navigation */}
                     <View style={styles.tabContainer}>
