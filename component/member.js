@@ -1,30 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ImageBackground, Text } from 'react-native';
+import { View, StyleSheet, ImageBackground, Text, Image, TouchableOpacity } from 'react-native';
 import { API_URL } from '@env';
+import * as ImagePicker from 'expo-image-picker';
 
-// 사용자 정보를 불러오는 함수
-async function fetchUserInfo(token) {
-  try {
-    console.log('사용된 토큰:', token); // 토큰 출력
-
-    const response = await fetch(`${API_URL}/mypage`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const json = await response.json();
-    return json;
-  } catch (error) {
-    console.error('사용자 정보 가져오기 에러:', error);
-    return {};
-  }
-}
-
-// Member 컴포넌트 정의
 function Member({ route, navigation }) {
   const token = route.params?.token;
+
+  // 상태 변수 선언
   const [userInfo, setUserInfo] = useState({
     user_id: '',
     name: '',
@@ -32,27 +14,90 @@ function Member({ route, navigation }) {
     birth: '',
     credit: '',
   });
+  const [profileImage, setProfileImage] = useState(null);
 
+  // 사용자 정보 가져오기
   useEffect(() => {
-    const fetchAndSetUserInfo = async () => {
-      const data = await fetchUserInfo(token);
-      setUserInfo(data);
-    };
+    async function fetchAndSetUserInfo() {
+      try {
+        const response = await fetch(`${API_URL}/mypage`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const json = await response.json();
+        setUserInfo(json);
+      } catch (error) {
+        console.error('사용자 정보 가져오기 에러:', error);
+      }
+    }
 
     if (token) {
       fetchAndSetUserInfo();
     }
   }, [token]);
 
+  // 이미지 선택 함수
+  const selectImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+    if (!result.cancelled) {
+      setProfileImage({ uri: result.uri });
+      uploadImage(result.uri);
+    }
+  };
+
+  const uploadImage = async (uri) => {
+    const formData = new FormData();
+    formData.append('image', {
+      uri: uri,
+      type: 'image/jpeg', // 또는 파일에 따라 'image/png' 등
+      name: 'profile.jpg', // 임의의 파일명
+    });
+  
+    try {
+      const response = await fetch(`${API_URL}/mypage/modify-info`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`, // 필요한 토큰
+        },
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        throw new Error('서버에서 이미지 업로드 실패');
+      }
+  
+      const json = await response.json();
+      console.log('업로드 성공:', json);
+    } catch (error) {
+      console.error('이미지 업로드 에러:', error);
+    }
+  };
+
   return (
     <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
       <View style={styles.container}>
+        <TouchableOpacity onPress={selectImage}>
+          <Image
+            source={profileImage || require('../assets/img/image.png')}
+            style={styles.profileImage}
+          />
+          <Text style={styles.buttonText}>파일 선택</Text>
+        </TouchableOpacity>
         <Text style={styles.infoText}>이메일: {userInfo.user_id}</Text>
         <Text style={styles.infoText}>이름: {userInfo.name}</Text>
         <Text style={styles.infoText}>전화번호: {userInfo.phone}</Text>
         <Text style={styles.infoText}>생년월일: {userInfo.birth}</Text>
         <Text style={styles.infoText}>크레딧: {userInfo.credit}</Text>
-        {/* 여기에 추가적인 UI 요소나 로직을 구현할 수 있습니다 */}
       </View>
     </ImageBackground>
   );
@@ -93,7 +138,7 @@ const styles = StyleSheet.create({
     borderRadius: 25, // 버튼의 모서리를 둥글게
     marginTop: 10, // 위에서부터의 마진
     marginBottom: 20, // 아래에서부터의 마진
- },
+  },
   button: {
     backgroundColor: 'rgba(255, 255, 255, 0.3)', // 버튼의 배경색과 투명도 조정
     paddingHorizontal: 30,
@@ -112,6 +157,12 @@ const styles = StyleSheet.create({
     resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
     marginTop: 20, // 이미지의 상단 간격을 조정합니다.
   },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50, // 원형 이미지로 만들기 위함
+  },
+  
 });
 
 export default Member;

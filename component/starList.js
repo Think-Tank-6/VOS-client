@@ -13,8 +13,8 @@ function StarList({ navigation }) {
     // Access Token (인증이 필요한 경우 사용)
     // 실제 앱에서는 로그인 후 받은 token을 사용해야 합니다.
     
-    const navigateToChat = (star_id) => {
-        navigation.navigate('Chat', { star_id });
+    const navigateToChat = (userId) => {
+        navigation.navigate('Chat', { userId });
     };
     const navigateToMypage = () => {
         navigation.navigate('setting'); // 'Mypage'는 설정 페이지로 이동하는 라우트 이름입니다.
@@ -46,7 +46,7 @@ function StarList({ navigation }) {
             });
             const json = await response.json();
             const starsWithMessages = await Promise.all(json.stars.map(async (star) => {
-                const lastMessage = await fetchLastMessage(star.star_id, accessToken);
+                const lastMessage = await fetchLastMessage(star.id, accessToken);
                 return { ...star, lastMessage };
             }));
             setStars(starsWithMessages);
@@ -69,12 +69,8 @@ function StarList({ navigation }) {
                 throw new Error(`Server responded with status: ${response.status}`);
             }
 
-            const lastMessageData = await response.json();
-            if (lastMessageData && lastMessageData.content) {
-                return lastMessageData.content;
-            } else {
-                return "메시지가 없습니다."; // 서버 응답에 content가 없는 경우
-            }
+            const json = await response.json();
+            return json.message || "메시지가 없습니다.";
         } catch (error) {
             console.error(`Error fetching last message for star ${starId}: ${error.message}`);
             return "메시지를 가져올 수 없습니다.";
@@ -103,7 +99,7 @@ function StarList({ navigation }) {
             return (
                 <View style={styles.starsListContainer}>
                     {stars.map((star, index) => (
-                        <TouchableOpacity key={star.star_id || index} onPress={() => navigateToChat(star.star_id)} style={styles.starItem}>
+                        <TouchableOpacity key={star.id || index} onPress={() => navigateToChat(star.id)} style={styles.starItem}>
                             <Image source={{ uri: star.image }} style={styles.starImage} />
                             <View style={styles.starInfoContainer}>
                                 <Text style={styles.starName}>{star.star_name}</Text>

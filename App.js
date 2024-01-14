@@ -5,7 +5,6 @@ import Main from './component/main';
 import Login from './auth/login';
 import Join from './auth/join';
 import StarList from './component/starList';
-import Chat from './component/chat';
 import KakaoLogin from './auth/kakao_login';
 import Admin from './admin/navigation/admin';
 import UserDetail from './admin/components/userDetail';
@@ -40,11 +39,6 @@ export default function App() {
           name="StarList"
           component={StarList}
           options={{ headerShown: false }} // 여기에 추가
-        />
-        <Stack.Screen 
-          name="Chat" 
-          component={Chat} 
-          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="KakaoLogin"
