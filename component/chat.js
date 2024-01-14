@@ -124,7 +124,7 @@ function Chat({ route }) {
   const renderAvatar = (props) => (
     props.currentMessage.user._id === 'assistant' ? (
         <Image
-            source={{ uri: starImg || 'https://voice-of-the-star.s3.ap-northeast-2.amazonaws.com/casey-horner-RmoWqDCqN2E-unsplash.jpg' }}
+            source={{ uri: starImg }}
             style={{ width: 36, height: 36, borderRadius: 18 }}
         />
     ) : null
