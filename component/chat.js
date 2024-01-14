@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import useSocket from '../hooks/useSocket';
 import { API_URL } from '@env';
 import getAccessTokenFromHeader from '../hooks/getAccessTokenFromHeader';
+import defaultStarImg from '../assets/img/defaultStar.jpg'; // 로컬 이미지 경로
 
 function Chat({ route }) {
   const [messages, setMessages] = useState([]);
@@ -121,14 +122,18 @@ function Chat({ route }) {
     <Time {...props} />
   );
 
-  const renderAvatar = (props) => (
-    props.currentMessage.user._id === 'assistant' ? (
+  const renderAvatar = (props) => {
+    const imageSource = props.currentMessage.user._id === 'assistant' && starImg ? { uri: starImg } : defaultStarImg;
+    return(
+      
+      props.currentMessage.user._id === 'assistant' ? (
         <Image
-            source={{ uri: starImg }}
-            style={{ width: 36, height: 36, borderRadius: 18 }}
+        source={imageSource}
+        style={{ width: 36, height: 36, borderRadius: 18 }}
         />
-    ) : null
-  )
+        ) : null
+    )
+  }
 
   return (
     <ImageBackground style={styles.wrapper} source={require('../assets/img/background.png')}>
