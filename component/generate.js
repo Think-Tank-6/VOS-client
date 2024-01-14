@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, Button } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Loading from './loading';
 import { API_URL } from '@env';
+import getAccessTokenFromHeader from '../hooks/getAccessTokenFromHeader';
 
 const Generate = ({ closeModal }) => {
   const [name, setName] = useState('');
+  const [gender, setGender] = useState('M');
   const [birthDate, setBirthDate] = useState(new Date());
   const [deceaseDate, setDeceaseDate] = useState(new Date());
   const [relationship, setRelationship] = useState('');
@@ -18,6 +20,10 @@ const Generate = ({ closeModal }) => {
   const [deceaseDateSelected, setDeceaseDateSelected] = useState(false);
   const [showBirthDatePicker, setShowBirthDatePicker] = useState(false);
   const [showDeceaseDatePicker, setShowDeceaseDatePicker] = useState(false);
+
+  const handleSelectGender = (gender) => {
+    setGender(gender);
+  };
 
   // 생년월일 변경 처리 함수
   const handleBirthDateChange = (event, selectedDate) => {
@@ -72,6 +78,7 @@ const Generate = ({ closeModal }) => {
     // FormData 객체 생성
     const formData = new FormData();
     formData.append('name', name);
+    formData.append('gender', gender);
     formData.append('birthDate', birthDate.toISOString());
     formData.append('deceaseDate', deceaseDate.toISOString());
     formData.append('relationship', relationship);
@@ -85,12 +92,22 @@ const Generate = ({ closeModal }) => {
         formData.append('audioFile', selectedAudioFile);
     }
 
+    
+    // 헤더에 사용할 accessToken 가져오기
+    const accessToken = await getAccessTokenFromHeader();
+    
+    if (!accessToken) {
+      console.log('Access token is missing');
+      setLoading(false);
+      return;
+    }
+
     try {
         const response = await fetch(`${API_URL}/stars`, { 
             method: 'POST',
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${yourAuthToken}`,
+                'Authorization': `Bearer ${accessToken}`,
             },
             body: formData,
         });
@@ -150,14 +167,33 @@ const Generate = ({ closeModal }) => {
           </Text>
         </View>
 
-        <Text style={styles.label}>이름</Text>
-        <TextInput
-          style={[styles.baseInput, styles.nameInput]}
-          placeholder="이름"
-          placeholderTextColor = '#B1B1B1'
-          value={name}
-          onChangeText={setName}
-        />
+        <View style={styles.namengender}>
+          <View style={styles.name}>
+            <Text style={styles.label}>이름</Text>
+            <TextInput
+              style={[styles.baseInput, styles.nameInput]}
+              placeholder="이름"
+              placeholderTextColor = '#B1B1B1'
+              value={name}
+              onChangeText={setName}
+            />
+          </View>
+          <View style={{ paddingLeft: 10 }}>
+            <Text style={styles.label}>성별</Text>
+            <View style={styles.genderBox}>
+              <TouchableOpacity
+                style={[styles.buttonL, { backgroundColor: gender === 'M' ? 'rgba(61,159,136,0.5)' : 'gray' }]}
+                onPress={() => handleSelectGender('M')}>
+                <Text style={{color : gender === 'M' ? 'white' : '#B1B1B1'}}>남</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.buttonR, { backgroundColor: gender === 'F' ? 'rgba(61,159,136,0.5)' : 'gray' }]}
+                onPress={() => handleSelectGender('F')}>
+                <Text style={{color : gender === 'F' ? 'white' : '#B1B1B1'}}>여</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
 
         <Text style={styles.label}>생년월일</Text>
         <View style={styles.datePickerContainer}>
@@ -285,6 +321,31 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     color: '#DBDBDB',
     fontSize: 11,
+  },
+  namengender: {
+    flexDirection: 'row',
+  },
+  name: {
+    flex:1
+  },
+  genderBox: {
+    flexDirection: 'row',
+  },
+  buttonL: {
+    height: 40,
+    width: 40,
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonR: {
+    height: 40,
+    width: 40,
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   featuerInput: {
     textAlignVertical: 'top',
