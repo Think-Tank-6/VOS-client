@@ -13,6 +13,7 @@ import Mypage from './component/mypage'
 import Pwupdate from './component/pwupdate';
 import AdminLogin from './admin/components/adminLogin';
 import AdminJoin from './admin/components/adminJoin';
+import Chat from './component/chat';
 
 const Stack = createNativeStackNavigator();
 
@@ -53,6 +54,11 @@ export default function App() {
         <Stack.Screen 
           name="UserDetail" 
           component={UserDetail}
+        />
+        <Stack.Screen 
+          name="Chat" 
+          component={Chat} 
+          options={{ headerShown: false }} 
         />
         <Stack.Screen
           name="setting"
