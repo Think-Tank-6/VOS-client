@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, CheckBox } from 'react-native';
+import { API_URL } from '@env';
 
 const AdminList = () => {
   const [filteredMemberList, setFilteredMemberList] = useState([]);
@@ -10,7 +11,7 @@ const AdminList = () => {
   
   const fetchAdmins = (page) => {
 
-    const url = `http://192.168.0.96:8000/admin/admin-list?page=${page}&page_size=8`;
+    const url = `${API_URL}/admin/admin-list?page=${page}&page_size=8`;
    
     fetch(url)
       .then(response => response.json())
