@@ -51,8 +51,12 @@ function StarList({ navigation }) {
                 const lastMessage = await fetchLastMessage(star.star_id, accessToken);
                 const localUri = `${FileSystem.cacheDirectory}${star.star_id}.jpg`;
                 const fileInfo = await FileSystem.getInfoAsync(localUri);
-                if(!fileInfo.exists) {
-                    await FileSystem.downloadAsync(star.image, localUri);
+                if (!star.image) {
+                    star.image = 'https://voice-of-the-star.s3.ap-northeast-2.amazonaws.com/casey-horner-RmoWqDCqN2E-unsplash.jpg'
+                } else {
+                    if(!fileInfo.exists) {
+                        await FileSystem.downloadAsync(star.image, localUri);
+                    }
                 }
                 return { ...star, lastMessage, localImage: localUri };
             }));
