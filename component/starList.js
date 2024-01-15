@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import Generate from './generate';
 import { API_URL } from '@env';
@@ -120,6 +121,21 @@ function StarList({ navigation }) {
             );
         }
     }
+
+    useFocusEffect(
+        useCallback(() => {
+            const fetchAccessTokenAndStars = async () => {
+                const accessToken = await getAccessTokenFromHeader();
+                if (accessToken) {
+                    fetchStars(accessToken);
+                } else {
+                    console.log('No access token found');
+                    navigation.navigate('Login');
+                }
+            };
+            fetchAccessTokenAndStars();
+        }, [])
+    );
 
     return (
         <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper}>
