@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MemberComponent from './member';
 import PwupdateComponent from './pwupdate';
-import DeleteComponent from './delete';
+// import DeleteComponent from './delete';
 
 const Tab = createBottomTabNavigator();
 

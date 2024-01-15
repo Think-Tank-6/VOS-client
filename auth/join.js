@@ -99,6 +99,7 @@ function Join({ navigation }) {
 
 
     try {
+      
       const response = await fetch(`${API_URL}/users/join`, {
         method: 'POST',
         headers: {

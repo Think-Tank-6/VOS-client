@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 function Member({ route, navigation }) {
   const token = route.params?.token;
 
+
   // 상태 변수 선언
   const [userInfo, setUserInfo] = useState({
     user_id: '',

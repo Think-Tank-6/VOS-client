@@ -9,6 +9,7 @@ import {
   Platform,
   Button,
 } from 'react-native';
+import { API_URL } from '@env';
 
 
 function AdminJoin({ navigation }) {
@@ -24,7 +25,7 @@ function AdminJoin({ navigation }) {
   const handleSubmit = async () => {
 
     try {
-      const response = await fetch('http://192.168.0.96:8000/admin/join', {
+      const response = await fetch(`${API_URL}/admin/join`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

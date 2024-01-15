@@ -29,13 +29,11 @@ const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
     backgroundColor: 'rgba(0, 0, 0)', // 반투명 배경
   },
   modalView: {
     margin: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#2A2826',
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',

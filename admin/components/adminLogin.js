@@ -5,7 +5,7 @@ import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useIsFocused } from '@react-navigation/native';
 import { Alert } from 'react-native';
-
+import { API_URL } from '@env';
 
 const AdminLogin = ({ navigation }) => {
   // 상태 변수 정의
@@ -14,7 +14,7 @@ const AdminLogin = ({ navigation }) => {
 
   // 로그인 처리 함수
   const handleLogin = async () => {
-    const url = 'http://192.168.0.96:8000/admin/login';
+    const url = `${API_URL}/admin/login`;
   
     try {
       const response = await fetch(url, {

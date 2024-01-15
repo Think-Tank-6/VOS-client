@@ -97,6 +97,7 @@ function StarList({ navigation }) {
 
     const handleCloseModal = () => {
         setModalVisible(false);
+        
     };
 
     const renderStars = () => {

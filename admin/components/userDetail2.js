@@ -1,50 +1,51 @@
 // 상세페이지、 수정
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
-import { API_URL } from '@env';
+
 
 const UserDetail = ({ route }) => {
   const { user } = route.params;
   const [userDetails, setUserDetails] = useState({});
-
-  // const fetchUserDetails = async () => {
-  //   try {
-  //     const response = await fetch(`http://172.20.144.1:8000/admin/user-list/${user.user_id}`);
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       setUserDetails(data);
-  //     } else {
-  //       console.error('Failed to fetch user details');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //   }
-  // };
+  
+  const fetchUserDetails = async () => {
+    try {
+      const response = await fetch(`http://172.20.144.1:8000/admin/user-list/${user.user_id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setUserDetails(data);
+      } else {
+        console.error('Failed to fetch user details');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   useEffect(() => {
-
-    fetch(`${API_URL}/admin/user-list/${user.user_id}`)
-      .then(response => response.json())
-      .then(data => {
-        setUserDetails(data);
-      })
-      .catch(error => console.error('Error:', error));
-      
+    fetchUserDetails();
   }, [user.user_id]);
 
-  const handleUserStatusUpdate = async (userId, newStatus) => {
+  const handleUserStatusUpdate = async (user_id, newStatus) => {
     try {
-      const response = await fetch(`${API_URL}/admin/user-status/${userId}`, {
+      // 'suspended' 상태면 0, 아니면 1
+      const statusValue = newStatus === 'suspended' ? 0 : 1;
+
+      const encodedUserId = encodeURIComponent(user_id);
+      // PATCH 요청 URL
+      const url = `http://172.20.144.1:8000/admin/user-status/${encodedUserId}`;
+      // const url = `http://172.20.144.1:8000/admin/user-status/${user_id}`;
+
+      const response = await fetch(url, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: statusValue }),
       });
 
       if (response.ok) {
         console.log('User status updated');
-        fetchUserDetails(); 
+        // fetchUserDetails();
       } else {
         throw new Error(`Error: ${response.status}`);
       }
