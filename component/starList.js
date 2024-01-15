@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import Generate from './generate';
 import { API_URL } from '@env';
 import getAccessTokenFromHeader from '../hooks/getAccessTokenFromHeader';
-import { Hook } from "tapable";
+import * as FileSystem from 'expo-file-system';
 
 function StarList({ navigation }) {
     const [stars, setStars] = useState([]);
@@ -46,12 +46,19 @@ function StarList({ navigation }) {
                 }
             });
             const json = await response.json();
-            const starsWithMessages = await Promise.all(json.stars.map(async (star) => {
-                console.log(star)
+    
+            const starsWithAdditionalData = await Promise.all(json.stars.map(async (star) => {
                 const lastMessage = await fetchLastMessage(star.star_id, accessToken);
-                return { ...star, lastMessage };
+                const localUri = `${FileSystem.cacheDirectory}${star.star_id}.jpg`;
+                const fileInfo = await FileSystem.getInfoAsync(localUri);
+                if(!fileInfo.exists) {
+                    await FileSystem.downloadAsync(star.image, localUri);
+                }
+                return { ...star, lastMessage, localImage: localUri };
             }));
-            setStars(starsWithMessages);
+    
+            setStars(starsWithAdditionalData);
+    
         } catch (error) {
             console.error(`Error fetching stars: ${error.message}`);
         }
