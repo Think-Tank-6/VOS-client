@@ -8,6 +8,7 @@ import getAccessTokenFromHeader from '../hooks/getAccessTokenFromHeader';
 import defaultStarImg from '../assets/img/defaultStar.jpg'; // 로컬 이미지 경로
 import Clipboard from '@react-native-community/clipboard';
 import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
 
 function Chat({ route }) {
   const [messages, setMessages] = useState([]);
@@ -56,35 +57,17 @@ function Chat({ route }) {
   useEffect(() => {
     const fetchAccessTokenAndStars = async () => {
         const accessToken = await getAccessTokenFromHeader();
-        if (accessToken) {
-            fetchStars(accessToken);
-        } else {
+        if (!accessToken) {
             console.log('No access token found');
             navigation.navigate('Login');
         }
     };
-
     fetchAccessTokenAndStars();
     fetchChatInfo();
+    const imagePath = `${FileSystem.cacheDirectory}${star_id}.jpg`;
+    setStarImg(imagePath);
   }, [starId]);
 
-  const fetchStars = async (accessToken) => {
-      try {
-          const response = await fetch(`${API_URL}/stars`, {
-              method: 'GET',
-              headers: {
-                  'Authorization': `Bearer ${accessToken}`,
-                  'Content-Type': 'application/json'
-              }
-          });
-          const json = await response.json();
-          const matchedStar = json.stars.find((s) => s.star_id === starId); if (matchedStar) { 
-            setStarImg(matchedStar.image);
-          }
-      } catch (error) {
-          console.error(`Error fetching stars: ${error.message}`);
-      }
-  };
 
   const { isConnected, sendMessage, receiveMessage } = useSocket(starId, onMessageReceived);
 

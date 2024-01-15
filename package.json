@@ -23,6 +23,7 @@
     "expo": "~49.0.15",
     "expo-av": "^13.6.0",
     "expo-document-picker": "~11.5.4",
+    "expo-file-system": "^15.6.0",
     "expo-image-picker": "~14.3.2",
     "expo-status-bar": "~1.6.0",
     "moment": "^2.30.1",
