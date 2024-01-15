@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
@@ -6,6 +6,14 @@ import { API_URL } from '@env';
 function Login({ navigation }) {
     const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
+
+    useEffect(() => {
+        const clearToken = async () => {
+            await AsyncStorage.removeItem('accessToken');
+        };
+
+        clearToken();
+    }, []);
 
     const onLoginPress = async () => {
         const loginData = {

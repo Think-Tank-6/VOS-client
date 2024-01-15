@@ -9,7 +9,7 @@ function Main({ navigation }) {
 
         const checkToken = async () => {
             try {
-                const token = await AsyncStorage.getItem('userToken');
+                const token = await AsyncStorage.getItem('accessToken');
                 if (token) {
                     navigation.navigate('StarList'); // 토큰이 있으면 StarList 페이지로 이동
                     clearTimeout(timer); // 타이머 취소
