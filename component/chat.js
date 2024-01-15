@@ -151,18 +151,20 @@ function Chat({ route, navigation }) {
     )
   }
 
-  const playSound = (audioUrl) => {
-    const sound = new Sound(audioUrl, null, (error) => {
-      if (error) {
-        console.log('오디오 파일 로딩 실패:', error);
-        return;
-      }
-      sound.play((success) => {
-        if (!success) {
-          console.log('오디오 재생 실패:', error);
-        }
-      });
-    });
+  useEffect(() => {
+    if (cloningData) {
+      playSound(cloningData); // 오디오 URL 상태가 변경되면 재생합니다.
+    }
+  }, [cloningData]);
+  
+  const playSound = async (audioBase64) => {
+    try {
+      const soundObject = new Audio.Sound();
+      await soundObject.loadAsync({ uri: `data:audio/wav;base64,${audioBase64}` });
+      await soundObject.playAsync();
+    } catch (error) {
+      console.error("Audio play error:", error);
+    }
   };
 
   async function sendVoiceMessage(message) {
@@ -185,9 +187,7 @@ function Chat({ route, navigation }) {
       console.log('Response OK:', response.ok);
       console.log('Voice message sent:', responseData);
 
-      if (responseData.audio_url) {
-        setCloningData(responseData.audio_url);
-      }
+      setCloningData(responseData.audio_url);
 
     } catch (error) {
       console.error('Error sending voice message:', error);
