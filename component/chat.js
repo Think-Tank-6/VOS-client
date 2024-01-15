@@ -14,7 +14,8 @@ function Chat({ route }) {
   const [messages, setMessages] = useState([]);
   const { star_id } = route.params; // Extract star_id from navigation parameters
   const [starId, setStarId] = useState(star_id); // Use the passed star_id
-  const [starImg, setStarImg] = useState(star_id); // Use the passed star_id
+  const [starImg, setStarImg] = useState(); // Use the passed star_id
+  const [cloningData, setCloningData] = useState(null);
 
   // Fetch initial chat messages
   const fetchChatInfo = async () => {
@@ -120,6 +121,65 @@ function Chat({ route }) {
     )
   }
 
+  const playSound = (audioUrl) => {
+    const sound = new Sound(audioUrl, null, (error) => {
+      if (error) {
+        console.log('오디오 파일 로딩 실패:', error);
+        return;
+      }
+      sound.play((success) => {
+        if (!success) {
+          console.log('오디오 재생 실패:', error);
+        }
+      });
+    });
+  };
+
+  async function sendVoiceMessage(message) {
+    try {
+      const accessToken = await getAccessTokenFromHeader();
+      const response = await fetch(`${API_URL}/chat/play-voice/${star_id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: message.text }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('API 호출 실패');
+      }
+  
+      const responseData = await response.json();
+      console.log('Response OK:', response.ok);
+      console.log('Voice message sent:', responseData);
+
+      if (responseData.audio_url) {
+        setCloningData(responseData.audio_url);
+      }
+
+    } catch (error) {
+      console.error('Error sending voice message:', error);
+    }
+  }  
+
+  function onLongPress(context, message) {
+    const options = ['목소리 듣기', '복사하기', '취소'];
+    const cancelButtonIndex = options.length - 1;
+  
+    context.actionSheet().showActionSheetWithOptions(
+      { options, cancelButtonIndex },
+      (buttonIndex) => {
+        if (buttonIndex === 0) {
+          sendVoiceMessage(message);
+        } else if (buttonIndex === 1) {
+          Clipboard.setString(message.text);
+        }
+      }
+    );
+  }
+  
   return (
     <ImageBackground style={styles.wrapper} source={require('../assets/img/background.png')}>
       <StatusBar style='light' />
@@ -133,6 +193,7 @@ function Chat({ route }) {
         renderBubble={renderBubble}
         renderTime={renderTime}
         renderAvatar={renderAvatar}
+        onLongPress={(context, message) => onLongPress(context, message)}
       />
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} />
     </ImageBackground>
