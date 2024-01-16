@@ -1,26 +1,27 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { BackHandler, View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal, Alert } from 'react-native';
+import { BackHandler, View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import Generate from './generate';
 import { API_URL } from '@env';
 import getAccessTokenFromHeader from '../hooks/getAccessTokenFromHeader';
 import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
 
 function StarList({ navigation }) {
     const [stars, setStars] = useState([]);
     const [modalVisible, setModalVisible] = useState(false); // Modal의 표시 상태를 관리하는 상태 변수를 추가합니다.
-
-    // Access Token (인증이 필요한 경우 사용)
-    // 실제 앱에서는 로그인 후 받은 token을 사용해야 합니다.
-
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [editingStar, setEditingStar] = useState(null);
+    const [accessToken, setAccessToken] = useState('');
+    
     const navigateToChat = (star_id) => {
         navigation.navigate('Chat', { star_id });
     };
     const navigateToMypage = () => {
         navigation.navigate('setting'); // 'Mypage'는 설정 페이지로 이동하는 라우트 이름입니다.
     };
-
+    
     useEffect(() => {
         // 뒤로 가기 버튼을 눌렀을 때 호출될 함수 정의
         const backAction = () => {
@@ -34,10 +35,10 @@ function StarList({ navigation }) {
             ]);
             return true; // 이벤트를 여기서 처리했음을 나타냅니다.
         };
-    
+        
         // 이벤트 리스너 등록
         BackHandler.addEventListener('hardwareBackPress', backAction);
-    
+        
         // 컴포넌트 언마운트 시 이벤트 리스너 제거
         return () => {
             BackHandler.removeEventListener('hardwareBackPress', backAction);
@@ -55,7 +56,7 @@ function StarList({ navigation }) {
                 }
             });
             const json = await response.json();
-    
+            
             const starsWithAdditionalData = await Promise.all(json.stars.map(async (star) => {
                 const lastMessage = await fetchLastMessage(star.star_id, accessToken);
                 const localUri = `${FileSystem.cacheDirectory}${star.star_id}.jpg`;
@@ -76,9 +77,209 @@ function StarList({ navigation }) {
             console.error(`Error fetching stars: ${error.message}`);
         }
     };
+    
+    function EditStarModal({ visible, star, onClose, onSave }) {
+        // 초기 상태를 star 객체의 속성으로 설정합니다.
+        const [name, setName] = useState(star ? star.star_name : '');
+        const [image, setImage] = useState(star && star.image ? star.image : '');
+        
+        if (!star) {
+            return null;
+        }
+        
+        const handleSave = () => {
+            onSave({ ...star, star_name: name, image: image });
+            onClose();
+        };
+
+        // 모달 닫을 때 이미지 상태 초기화
+        const handleClose = () => {
+            setImage(star ? star.image : '');
+            onClose();
+        };
+
+        const selectImage = async () => {
+            const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          
+            if (permissionResult.granted === false) {
+              alert("사진 앨범에 대한 접근 권한이 필요합니다.");
+              return;
+            }
+          
+            const pickerResult = await ImagePicker.launchImageLibraryAsync();
+            if (pickerResult.canceled) {
+              return;
+            }
+          
+            if (pickerResult.assets && pickerResult.assets.length > 0) {
+                const selectedImage = pickerResult.assets[0];
+                setImage(selectedImage.uri); // 새 이미지 상태를 업데이트
+            }
+        };
+        
+        return (
+            <Modal
+                visible={visible}
+                onRequestClose={handleClose}
+                transparent={true}
+                style={styles.modal}
+            >
+                <View style={styles.modal}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>별 정보 수정</Text>
+                        <View style={styles.editImg}>
+                            {image ? (
+                                <Image key={image} source={{ uri: image }} style={styles.starImage} />
+                            ) : (
+                                <Image source={{ uri: star.image }} style={styles.starImage} />
+                            )}
+                            <TouchableOpacity onPress={selectImage} style={styles.selectImage}>
+                                <Text style={styles.selectText}>파일 업로드</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Text style={styles.name}>이름</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="이름"
+                            value={name}
+                            onChangeText={setName}
+                            />
+                        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                            <Text style={styles.saveButtonText}>저장</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.delete} onPress={() => deleteStar(star.star_id, accessToken)}>삭제하기</Text>
+                    </View>
+                </View>
+            </Modal>
+        );
+        
+    };
+
+    const savemodule = (updatedStar) => {
+        handleSaveStar(updatedStar, accessToken);
+        uploadImageAndUpdateStar(updatedStar, accessToken);
+    }
+    
+    const handleSaveStar = async (updatedStar, accessToken) => {
+        try {
+            const response = await fetch(`${API_URL}/stars/${updatedStar.star_id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    star_name: updatedStar.star_name,
+                })
+            });
+    
+            if (!response.ok) {
+                throw new Error('업데이트 실패');
+            }
+    
+            // 서버로부터 응답받은 업데이트된 데이터를 저장합니다.
+            const updatedStarData = await response.json();
+            
+            // 로컬 상태 업데이트
+            setStars(stars.map(star => star.star_id === updatedStar.star_id ? updatedStarData : star));
+        } catch (error) {
+            console.error('별 정보 업데이트 오류:', error);
+        }
+    };
+
+    const uploadImageAndUpdateStar = async (updatedStar, accessToken) => {
+        try {
+            // URL에서 이미지를 다운로드합니다.
+            const imageResponse = await fetch(updatedStar.image);
+            const blob = await imageResponse.blob();
+    
+            // Blob을 Base64 문자열로 변환합니다.
+            const reader = new FileReader();
+            reader.readAsDataURL(blob); 
+            reader.onloadend = async () => {
+                const base64data = reader.result.split(',')[1]; // Base64 인코딩 부분만 추출
+    
+                // 로컬 파일 시스템에 이미지를 저장합니다.
+                const localUri = FileSystem.documentDirectory + updatedStar.star_id + '.jpg';
+                await FileSystem.writeAsStringAsync(localUri, base64data, { encoding: FileSystem.EncodingType.Base64 });
+    
+                // FormData 객체 생성 및 파일 추가
+                const formData = new FormData();
+                formData.append('file', {
+                    uri: localUri,
+                    type: 'image/jpeg', // 이미지 타입에 맞게 설정
+                    name: updatedStar.star_id + '.jpg'
+                });
+    
+                // 이미지 업로드 API 요청
+                const response = await fetch(`${API_URL}/stars/${updatedStar.star_id}/uploadImage`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                    body: formData
+                });
+    
+                if (!response.ok) {
+                    throw new Error('이미지 업로드 실패');
+                }
+    
+                // 업로드된 이미지를 포함한 별의 정보를 가져옴
+                const updatedStarData = await response.json();
+    
+                // 로컬 상태 업데이트
+                setStars(stars.map(star => star.star_id === updatedStar.star_id ? updatedStarData : star));
+            };
+        } catch (error) {
+            console.error('이미지 업로드 및 별 정보 업데이트 오류:', error);
+        }
+    };
+
+    const deleteStar = (starId, accessToken) => {
+        Alert.alert(
+            "별 삭제", 
+            "이 별을 정말 삭제하시겠습니까?", 
+            [{
+                text: "취소",
+                onPress: () => console.log("삭제 취소됨"),
+                style: "cancel"
+            },
+            {
+                text: "삭제",
+                onPress: () => {
+                    performDelete(starId, accessToken);
+                }
+            }],
+            { cancelable: false }
+        );
+    };
+
+    const performDelete = async (starId, accessToken) => {
+        try {
+            const response = await fetch(`${API_URL}/stars/${starId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Server responded with status: ${response.status}`);
+            }
+    
+            // 별 삭제 후 리스트 업데이트
+            setStars(stars.filter(star => star.star_id !== starId));
+
+            // 모달 닫기
+            setEditModalVisible(false);
+        } catch (error) {
+            console.error(`Error deleting star ${starId}: ${error.message}`);
+            Alert.alert("삭제 실패", "별을 삭제하는 데 문제가 발생했습니다.");
+        }
+    }
 
     const fetchLastMessage = async (starId, accessToken) => {
-        console.log(starId)
         try {
             const response = await fetch(`${API_URL}/stars/${starId}/last`, {
                 method: 'GET',
@@ -126,8 +327,23 @@ function StarList({ navigation }) {
         } else {
             return (
                 <View style={styles.starsListContainer}>
+                    <EditStarModal
+                        key={editingStar ? editingStar.star_id : 'new-star'}
+                        visible={editModalVisible}
+                        star={editingStar}
+                        onClose={() => setEditModalVisible(false)}
+                        onSave={savemodule}
+                    />
                     {stars.map((star, index) => (
-                        <TouchableOpacity key={star.star_id || index} onPress={() => navigateToChat(star.star_id)} style={styles.starItem}>
+                        <TouchableOpacity 
+                            key={star.star_id || index} 
+                            onPress={() => navigateToChat(star.star_id)}
+                            onLongPress={() => {
+                                setEditingStar(star);
+                                setEditModalVisible(true);
+                            }}
+                            style={styles.starItem}
+                        >
                             <Image source={{ uri: star.image }} style={styles.starImage} />
                             <View style={styles.starInfoContainer}>
                                 <Text style={styles.starName}>{star.star_name}</Text>
@@ -149,6 +365,7 @@ function StarList({ navigation }) {
                 const accessToken = await getAccessTokenFromHeader();
                 if (accessToken) {
                     fetchStars(accessToken);
+                    setAccessToken(accessToken)
                 } else {
                     console.log('No access token found');
                     navigation.navigate('Main');
@@ -282,6 +499,86 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 16,
         bottom: 16,
+    },
+    modal: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경 설정
+    },
+    modalContent: {
+        width: '80%',
+        backgroundColor: '#2A2826',
+        padding: 20,
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    modalTitle: {
+        fontSize: 20, // 제목의 글꼴 크기
+        fontWeight: 'bold', // 글꼴 굵기
+        marginBottom: 15, // 제목 아래 마진
+        textAlign: 'center', // 텍스트 중앙 정렬
+        color: 'white', // 텍스트 색상
+    },
+    input: {
+        borderWidth: 1, // 테두리 두께
+        borderColor: '#ddd', // 테두리 색상
+        padding: 10, // 패딩
+        borderRadius: 5, // 테두리 둥글기
+        marginBottom: 10, // 아래쪽 마진
+        fontSize: 16, // 글꼴 크기
+        color: '#DBDBDB',
+    },
+    saveButton: {
+        backgroundColor: 'rgba(61,159,136,0.5)', // 배경 색상
+        padding: 10, // 패딩
+        borderRadius: 5, // 모서리 둥글기
+        justifyContent: 'center', // 중앙 정렬
+        alignItems: 'center', // 중앙 정렬
+    },
+    saveButtonText: {
+        color: 'white', // 텍스트 색상
+        fontSize: 16, // 글꼴 크기
+        fontWeight: 'bold', // 글꼴 굵기
+    },
+    editImg: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignSelf: 'center'
+    },
+    selectImage: {
+        width: 70,
+        height: 30,
+        backgroundColor: 'rgba(61,159,136,0.5)', // 배경 색상 적용
+        justifyContent: 'center', // 중앙 정렬
+        alignItems: 'center', // 중앙 정렬
+        marginBottom: 15,
+        marginTop: 5,
+    },
+    nowstarImage: {
+        width: 70,
+        height: 70,
+        borderRadius: 5,
+        marginRight: 10,
+        marginBottom: 10,
+    },
+    selectText: {
+        color: 'white', // 텍스트 색상
+    },
+    name: {
+        color: 'white', // 텍스트 색상
+        marginBottom: 5,
+    },
+    delete: {
+        color: 'white',
+        alignSelf: 'center',
+        marginTop: 30,
+        marginBottom: -10,
     },
 });
 
