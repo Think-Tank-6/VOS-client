@@ -311,7 +311,7 @@ function StarList({ navigation }) {
 
     const handleCloseModal = () => {
         setModalVisible(false);
-        
+        fetchStars(accessToken);
     };
 
     const renderStars = () => {
@@ -331,7 +331,10 @@ function StarList({ navigation }) {
                         key={editingStar ? editingStar.star_id : 'new-star'}
                         visible={editModalVisible}
                         star={editingStar}
-                        onClose={() => setEditModalVisible(false)}
+                        onClose={() => {
+                            setEditModalVisible(false);
+                            fetchStars(accessToken);
+                        }}
                         onSave={savemodule}
                     />
                     {stars.map((star, index) => (
