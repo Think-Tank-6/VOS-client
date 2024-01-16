@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Alert, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Alert, SafeAreaView,BackHandler, } from 'react-native';
 import { API_URL } from '@env';
 
 function Pwupdate({ route, navigation }) {
@@ -9,12 +9,25 @@ function Pwupdate({ route, navigation }) {
     const [newPasswordCheck, setNewPasswordCheck] = useState('');
     const [error, setError] = useState('');
 
+
+
+    useEffect(() => {
+        const backAction = () => {
+            navigation.goBack(); // 이전 화면으로 돌아가기
+            return true; // 이벤트 처리 완료
+        };
+
+        BackHandler.addEventListener('hardwareBackPress', backAction);
+
+        return () => BackHandler.removeEventListener('hardwareBackPress', backAction);
+    }, [navigation]);
+
     const handleSubmit = async () => {
         if (newPassword !== newPasswordCheck) {
             setError('새 비밀번호가 일치하지 않습니다.');
             return;
         }
-    
+
         try {
             const response = await fetch(`${API_URL}/mypage/modify-password`, {
                 method: 'PATCH',
@@ -24,15 +37,15 @@ function Pwupdate({ route, navigation }) {
                 },
                 body: JSON.stringify({
                     current_password: password,
-                    new_password: newPassword, 
+                    new_password: newPassword,
                 }),
             });
-    
+
             const json = await response.json(); // 한 번만 호출
             if (response.ok) {
                 Alert.alert("성공",
-                "비밀번호가 변경되었습니다.",
-                [{ text: "OK", onPress: () => navigation.navigate('Login') }]
+                    "비밀번호가 변경되었습니다.",
+                    [{ text: "OK", onPress: () => navigation.navigate('Login') }]
                 );
                 navigation.goBack();
             } else {
@@ -86,25 +99,25 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     container: {
-      justifyContent: 'flex-start',
-      padding: 20,
+        justifyContent: 'flex-start',
+        padding: 20,
     },
     titleImageImage: {
-      width: '100%', // 이미지의 가로 크기를 조정합니다.
-      height: '100%', // 이미지의 세로 크기를 조정합니다. 원하는 비율로 조정하세요.
-      resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
-      marginTop: 20,
+        width: '100%', // 이미지의 가로 크기를 조정합니다.
+        height: '100%', // 이미지의 세로 크기를 조정합니다. 원하는 비율로 조정하세요.
+        resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
+        marginTop: 20,
     },
     formContainer: { // 중앙 정렬을 위한 새로운 스타일
-      flex: 2, // flex 값을 조정하여 화면에 맞게 크기를 조절할 수 있습니다.
-      width: '80%', // 이 부분은 부모 뷰의 가로 크기의 80%를 차지하게 합니다.
-      alignSelf: 'center', // 부모 뷰의 중앙에 위치하게 합니다.
-      justifyContent: 'center',
+        flex: 2, // flex 값을 조정하여 화면에 맞게 크기를 조절할 수 있습니다.
+        width: '80%', // 이 부분은 부모 뷰의 가로 크기의 80%를 차지하게 합니다.
+        alignSelf: 'center', // 부모 뷰의 중앙에 위치하게 합니다.
+        justifyContent: 'center',
     },
     label: {
-      fontSize: 16,
-      marginTop: 10,
-      color : 'white'
+        fontSize: 16,
+        marginTop: 10,
+        color: 'white'
     },
     input: {
         height: 40,
@@ -113,31 +126,31 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         padding: 10,
         borderRadius: 5,
-        color : 'white',
-      },
+        color: 'white',
+    },
     errorText: {
-      color: 'red',
-      marginBottom: 10,
-  },
+        color: 'red',
+        marginBottom: 10,
+    },
     inputContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     button: {
-      padding: 10,
-      backgroundColor: 'white',
-      borderRadius: 5,
-      marginLeft: 10, // TextInput과의 간격
+        padding: 10,
+        backgroundColor: 'white',
+        borderRadius: 5,
+        marginLeft: 10, // TextInput과의 간격
     },
     checkboxContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginTop: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
     },
     checkboxText: {
-      marginLeft: 8,
-      color: 'white',
+        marginLeft: 8,
+        color: 'white',
     },
 });
 

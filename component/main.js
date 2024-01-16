@@ -1,39 +1,21 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 function Main({ navigation }) {
+    
 
     useEffect(() => {
-        let timer;
+        const timer = setTimeout(() => {
+            navigation.navigate('StarList'); // 5초 후에 StarList 페이지로 이동
+        }, 2000); // 2000밀리초 (2초) 후에 실행
 
-        const checkToken = async () => {
-            try {
-                const token = await AsyncStorage.getItem('accessToken');
-                if (token) {
-                    navigation.navigate('StarList'); // 토큰이 있으면 StarList 페이지로 이동
-                    clearTimeout(timer); // 타이머 취소
-                    return;
-                }
-                // 토큰이 없으면 로그인 페이지로 이동하는 타이머 설정
-                timer = setTimeout(() => {
-                    navigation.navigate('Login');
-                }, 3000);
-            } catch (error) {
-                console.error('Error reading token:', error);
-            }
-        };
-
-        checkToken();
-
-        return () => {
-            if (timer) clearTimeout(timer); // 컴포넌트가 언마운트될 때 타이머 제거
-        };
+        return () => clearTimeout(timer); // 컴포넌트가 언마운트될 때 타이머 정리
     }, [navigation]);
 
-    const onAddPress = () => {
-        navigation.navigate('Login');
-    };
+    // useFocusEffect 내부의 checkToken 호출 제거 또는 조정
+
 
     return (
         <ImageBackground source={require('../assets/img/main.png')} style={styles.wrapper} resizeMode="cover">
@@ -42,12 +24,6 @@ function Main({ navigation }) {
                     <Image source={require('../assets/img/title.png')} style={styles.centerImage} />
                 </View>
 
-                <TouchableOpacity
-                    style={styles.addButtonContainer}
-                    onPress={onAddPress}
-                >
-                    <Text style={styles.addText}>로그인</Text>
-                </TouchableOpacity>
             </SafeAreaView>
         </ImageBackground>
     );

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Alert, SafeAreaView } from 'react-native';
+import React, { useState,useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Alert, SafeAreaView,BackHandler, } from 'react-native';
 import { API_URL } from '@env';
 
 function Delete({ route, navigation }) {
@@ -18,6 +18,17 @@ function Delete({ route, navigation }) {
             ]
         );
     };
+
+    useEffect(() => {
+        const backAction = () => {
+          navigation.goBack(); // 이전 화면으로 돌아가기
+          return true; // 이벤트 처리 완료
+        };
+      
+        BackHandler.addEventListener('hardwareBackPress', backAction);
+      
+        return () => BackHandler.removeEventListener('hardwareBackPress', backAction);
+      }, [navigation]);
 
     const deleteUserAccount = async () => {
         try {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal } from 'react-native';
+import { BackHandler, View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import Generate from './generate';
@@ -21,21 +21,28 @@ function StarList({ navigation }) {
         navigation.navigate('setting'); // 'Mypage'는 설정 페이지로 이동하는 라우트 이름입니다.
     };
 
-
     useEffect(() => {
-        const fetchAccessTokenAndStars = async () => {
-            const accessToken = await getAccessTokenFromHeader();
-            if (accessToken) {
-                fetchStars(accessToken);
-            } else {
-                console.log('No access token found');
-                navigation.navigate('Login');
-            }
+        // 뒤로 가기 버튼을 눌렀을 때 호출될 함수 정의
+        const backAction = () => {
+            Alert.alert("앱 종료", "앱을 종료하시겠습니까?", [
+                {
+                    text: "취소",
+                    onPress: () => null,
+                    style: "cancel"
+                },
+                { text: "확인", onPress: () => BackHandler.exitApp() }
+            ]);
+            return true; // 이벤트를 여기서 처리했음을 나타냅니다.
         };
-
-        fetchAccessTokenAndStars();
+    
+        // 이벤트 리스너 등록
+        BackHandler.addEventListener('hardwareBackPress', backAction);
+    
+        // 컴포넌트 언마운트 시 이벤트 리스너 제거
+        return () => {
+            BackHandler.removeEventListener('hardwareBackPress', backAction);
+        };
     }, []);
-
     const fetchStars = async (accessToken) => {
         try {
             const response = await fetch(`${API_URL}/stars`, {
@@ -142,7 +149,7 @@ function StarList({ navigation }) {
                     fetchStars(accessToken);
                 } else {
                     console.log('No access token found');
-                    navigation.navigate('Login');
+                    navigation.navigate('Main');
                 }
             };
             fetchAccessTokenAndStars();

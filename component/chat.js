@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { GiftedChat, Bubble, Time } from 'react-native-gifted-chat';
-import { View, StyleSheet, ImageBackground, KeyboardAvoidingView, Image, Platform } from 'react-native';
+import { BackHandler, View, StyleSheet, ImageBackground, KeyboardAvoidingView, Image, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import useSocket from '../hooks/useSocket';
 import { API_URL } from '@env';
@@ -10,7 +10,7 @@ import Clipboard from '@react-native-community/clipboard';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
-function Chat({ route }) {
+function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
   const { star_id } = route.params; // Extract star_id from navigation parameters
   const [starId, setStarId] = useState(star_id); // Use the passed star_id
@@ -35,11 +35,11 @@ function Chat({ route }) {
       console.error('Error fetching chat info:', error);
     }
   };
-  
+
   // 서버로부터 메시지를 받았을 때 호출될 함수
   const onMessageReceived = useCallback((newMessage) => {
     console.log('New message received:', newMessage); // Add log for debugging
-  
+
     // 메시지 데이터가 올바른 형식인지 검증하고 변환
     const formattedMessage = {
       _id: newMessage._id || Math.round(Math.random() * 1000000), // 랜덤한 ID 생성 또는 백엔드에서 받은 _id 사용
@@ -50,24 +50,54 @@ function Chat({ route }) {
         name: newMessage.sender === 'user' ? 'User' : 'Assistant',
       },
     };
-  
+
     setMessages(previousMessages => GiftedChat.append(previousMessages, formattedMessage));
   }, []);
-  
+
   useEffect(() => {
     const fetchAccessTokenAndStars = async () => {
-        const accessToken = await getAccessTokenFromHeader();
-        if (!accessToken) {
-            console.log('No access token found');
-            navigation.navigate('Login');
-        }
+      const accessToken = await getAccessTokenFromHeader();
+      if (!accessToken) {
+        console.log('No access token found');
+        navigation.navigate('Login');
+      }
     };
     fetchAccessTokenAndStars();
     fetchChatInfo();
     const imagePath = `${FileSystem.cacheDirectory}${star_id}.jpg`;
     setStarImg(imagePath);
-  }, [starId]);
 
+    const backAction = () => {
+      navigation.goBack();
+      return true;
+    };
+  
+    BackHandler.addEventListener('hardwareBackPress', backAction);
+  
+    // 두 로직의 클린업(청소) 함수를 반환
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', backAction);
+    };
+
+  }, [starId, navigation]);
+
+  const fetchStars = async (accessToken) => {
+    try {
+      const response = await fetch(`${API_URL}/stars`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const json = await response.json();
+      const matchedStar = json.stars.find((s) => s.star_id === starId); if (matchedStar) {
+        setStarImg(matchedStar.image);
+      }
+    } catch (error) {
+      console.error(`Error fetching stars: ${error.message}`);
+    }
+  };
 
   const { isConnected, sendMessage, receiveMessage } = useSocket(starId, onMessageReceived);
 
@@ -110,14 +140,14 @@ function Chat({ route }) {
 
   const renderAvatar = (props) => {
     const imageSource = props.currentMessage.user._id === 'assistant' && starImg ? { uri: starImg } : defaultStarImg;
-    return(
-      
+    return (
+
       props.currentMessage.user._id === 'assistant' ? (
         <Image
-        source={imageSource}
-        style={{ width: 36, height: 36, borderRadius: 18 }}
+          source={imageSource}
+          style={{ width: 36, height: 36, borderRadius: 18 }}
         />
-        ) : null
+      ) : null
     )
   }
 
@@ -146,11 +176,11 @@ function Chat({ route }) {
         },
         body: JSON.stringify({ text: message.text }),
       });
-  
+
       if (!response.ok) {
         throw new Error('API 호출 실패');
       }
-  
+
       const responseData = await response.json();
       console.log('Response OK:', response.ok);
       console.log('Voice message sent:', responseData);
@@ -162,12 +192,12 @@ function Chat({ route }) {
     } catch (error) {
       console.error('Error sending voice message:', error);
     }
-  }  
+  }
 
   function onLongPress(context, message) {
     const options = ['목소리 듣기', '복사하기', '취소'];
     const cancelButtonIndex = options.length - 1;
-  
+
     context.actionSheet().showActionSheetWithOptions(
       { options, cancelButtonIndex },
       (buttonIndex) => {
@@ -179,7 +209,7 @@ function Chat({ route }) {
       }
     );
   }
-  
+
   return (
     <ImageBackground style={styles.wrapper} source={require('../assets/img/background.png')}>
       <StatusBar style='light' />
@@ -189,7 +219,7 @@ function Chat({ route }) {
       <GiftedChat
         messages={messages}
         onSend={newMessages => onSend(newMessages)}
-        user={{ _id: 'user' || 'assistant'}}
+        user={{ _id: 'user' || 'assistant' }}
         renderBubble={renderBubble}
         renderTime={renderTime}
         renderAvatar={renderAvatar}
