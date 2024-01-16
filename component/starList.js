@@ -43,6 +43,8 @@ function StarList({ navigation }) {
             BackHandler.removeEventListener('hardwareBackPress', backAction);
         };
     }, []);
+
+    
     const fetchStars = async (accessToken) => {
         try {
             const response = await fetch(`${API_URL}/stars`, {

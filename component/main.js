@@ -4,12 +4,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
 function Main({ navigation }) {
-    
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            navigation.navigate('StarList'); // 5초 후에 StarList 페이지로 이동
-        }, 2000); // 2000밀리초 (2초) 후에 실행
+        const timer = setTimeout(async () => {
+            try {
+                const token = await AsyncStorage.getItem('accessToken');
+                if (token) {
+                    // 토큰이 있으면 StarList 페이지로 이동
+                    navigation.navigate('StarList');
+                } else {
+                    // 토큰이 없으면 Login 페이지로 이동
+                    navigation.navigate('Login');
+                }
+            } catch (error) {
+                console.error('토큰 확인 중 에러 발생', error);
+            }
+        }, 2000); // 2초 후 실행
 
         return () => clearTimeout(timer); // 컴포넌트가 언마운트될 때 타이머 정리
     }, [navigation]);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ImageBackground, Image, TouchableOpacity, SafeAreaView, Alert,BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
 
@@ -13,6 +13,27 @@ function Login({ navigation }) {
         };
 
         clearToken();
+
+        const backAction = () => {
+            Alert.alert("앱 종료", "앱을 종료하시겠습니까?", [
+                {
+                    text: "취소",
+                    onPress: () => null,
+                    style: "cancel"
+                },
+                { text: "확인", onPress: () => BackHandler.exitApp() }
+            ]);
+            return true; // 이벤트를 여기서 처리했음을 나타냅니다.
+        };
+    
+        // 이벤트 리스너 등록
+        BackHandler.addEventListener('hardwareBackPress', backAction);
+    
+        // 컴포넌트 언마운트 시 이벤트 리스너 제거
+        return () => {
+            BackHandler.removeEventListener('hardwareBackPress', backAction);
+        };
+
     }, []);
 
     const onLoginPress = async () => {
