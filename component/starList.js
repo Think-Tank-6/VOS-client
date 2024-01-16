@@ -14,6 +14,7 @@ function StarList({ navigation }) {
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [editingStar, setEditingStar] = useState(null);
     const [accessToken, setAccessToken] = useState('');
+
     
     const navigateToChat = (star_id) => {
         navigation.navigate('Chat', { star_id });
@@ -21,6 +22,23 @@ function StarList({ navigation }) {
     const navigateToMypage = () => {
         navigation.navigate('setting'); // 'Mypage'는 설정 페이지로 이동하는 라우트 이름입니다.
     };
+
+    useFocusEffect(
+        useCallback(() => {
+            const fetchAccessTokenAndStars = async () => {
+                const accessToken = await getAccessTokenFromHeader();
+                console.log(accessToken)
+                if (accessToken) {
+                    fetchStars(accessToken);
+                    setAccessToken(accessToken)
+                } else {
+                    console.log('No access token found');
+                    navigation.navigate('Main');
+                }
+            };
+            fetchAccessTokenAndStars();
+        }, [])
+    );
     
     useEffect(() => {
         // 뒤로 가기 버튼을 눌렀을 때 호출될 함수 정의
@@ -362,22 +380,6 @@ function StarList({ navigation }) {
         }
     }
 
-    useFocusEffect(
-        useCallback(() => {
-            const fetchAccessTokenAndStars = async () => {
-                const accessToken = await getAccessTokenFromHeader();
-                if (accessToken) {
-                    fetchStars(accessToken);
-                    setAccessToken(accessToken)
-                } else {
-                    console.log('No access token found');
-                    navigation.navigate('Main');
-                }
-            };
-            fetchAccessTokenAndStars();
-        }, [])
-    );
-
     return (
         <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper}>
             <StatusBar style='light' />
@@ -395,7 +397,7 @@ function StarList({ navigation }) {
                 onRequestClose={handleCloseModal}
             >
                 <View style={styles.centeredModalView}>
-                    <Generate closeModal={handleCloseModal} />
+                    {modalVisible && <Generate closeModal={handleCloseModal} />}
                 </View>
             </Modal>
         </ImageBackground>
