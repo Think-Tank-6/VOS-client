@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Modal, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 
 const Loading = ({ visible, onClose }) => {
+  
     return (
       <Modal
         animationType="fade"

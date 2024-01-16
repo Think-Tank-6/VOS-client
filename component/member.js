@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ImageBackground, Text, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ImageBackground, Text, Image, TouchableOpacity,BackHandler, } from 'react-native';
 import { API_URL } from '@env';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -38,7 +38,19 @@ function Member({ route, navigation }) {
     if (token) {
       fetchAndSetUserInfo();
     }
-  }, [token]);
+    const backAction = () => {
+      navigation.goBack();
+      return true;
+    };
+
+    BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    // 두 로직의 클린업(청소) 함수를 반환
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', backAction);
+    };
+
+  }, [token,navigation]);
 
   // 이미지 선택 함수
   const selectImage = async () => {
@@ -48,7 +60,7 @@ function Member({ route, navigation }) {
       aspect: [4, 3],
       quality: 1,
     });
-  
+
     if (!result.cancelled) {
       setProfileImage({ uri: result.uri });
       uploadImage(result.uri);
@@ -62,7 +74,7 @@ function Member({ route, navigation }) {
       type: 'image/jpeg', // 또는 파일에 따라 'image/png' 등
       name: 'profile.jpg', // 임의의 파일명
     });
-  
+
     try {
       const response = await fetch(`${API_URL}/mypage/modify-info`, {
         method: 'PATCH',
@@ -72,11 +84,11 @@ function Member({ route, navigation }) {
         },
         body: formData,
       });
-  
+
       if (!response.ok) {
         throw new Error('서버에서 이미지 업로드 실패');
       }
-  
+
       const json = await response.json();
       console.log('업로드 성공:', json);
     } catch (error) {
@@ -163,7 +175,7 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50, // 원형 이미지로 만들기 위함
   },
-  
+
 });
 
 export default Member;
