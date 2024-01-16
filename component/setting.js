@@ -40,6 +40,16 @@ function Setting({ navigation }) {
     navigation.navigate(tabName, { token: accessToken });
   };
 
+  const handleLogout = async () =>{
+    try{
+      await AsyncStorage.removeItem('accessToken');
+      console.log('로그아웃 성공 : 토큰 삭제');
+      navigation.navigate('Login');
+    }catch(error){
+      console.error('로그아웃 에러',error);
+    }
+  };
+
   return (
     <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
@@ -50,6 +60,23 @@ function Setting({ navigation }) {
           <View style={styles.tabContainer}>
             <TouchableOpacity style={styles.tab} onPress={() => navigateToTab('mypage')}>
               <Text style={styles.tabText}>마이페이지</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.tabContainer}>
+            <TouchableOpacity style={styles.tab} onPress={() => navigateToTab('')}>
+              <Text style={styles.tabText}> 결제관리</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.tabContainer}>
+            <TouchableOpacity style={styles.tab} onPress={() => navigateToTab('')}>
+              <Text style={styles.tabText}>채팅 설정</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.tabContainer}>
+            <TouchableOpacity style={styles.tab} onPress={handleLogout}>
+              <Text style={styles.tabText}>로그아웃</Text>
             </TouchableOpacity>
           </View>
         </View>
