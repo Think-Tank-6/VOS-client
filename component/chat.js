@@ -1,44 +1,53 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { GiftedChat, Bubble, Time } from 'react-native-gifted-chat';
-import { BackHandler, View, StyleSheet, ImageBackground, KeyboardAvoidingView, Image, Platform } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import useSocket from '../hooks/useSocket';
-import { API_URL } from '@env';
-import getAccessTokenFromHeader from '../hooks/getAccessTokenFromHeader';
-import defaultStarImg from '../assets/img/defaultStar.jpg'; // 로컬 이미지 경로
-import Clipboard from '@react-native-community/clipboard';
-import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
+import React, { useState, useCallback, useEffect } from "react";
+import { GiftedChat, Bubble, Time } from "react-native-gifted-chat";
+import {
+  BackHandler,
+  View,
+  StyleSheet,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Image,
+  Platform,
+} from "react-native";
+import { StatusBar } from "expo-status-bar";
+import useSocket from "../hooks/useSocket";
+import { API_URL } from "@env";
+import getAccessTokenFromHeader from "../hooks/getAccessTokenFromHeader";
+import defaultStarImg from "../assets/img/defaultStar.jpg"; // 로컬 이미지 경로
+import Clipboard from "@react-native-community/clipboard";
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
 
 function Chat({ route, navigation }) {
   const [messages, setMessages] = useState([]);
   const { star_id } = route.params; // Extract star_id from navigation parameters
   const [starId, setStarId] = useState(star_id); // Use the passed star_id
   const [starImg, setStarImg] = useState(); // Use the passed star_id
-  const [cloningData, setCloningData] = useState(null);
 
   // Fetch initial chat messages
   const fetchChatInfo = async () => {
     try {
-      const messagesResponse = await fetch(`${API_URL}/chat/${star_id}/messages`);
+      const messagesResponse = await fetch(
+        `${API_URL}/chat/${star_id}/messages`
+      );
       const messagesData = await messagesResponse.json();
-      const formattedMessages = messagesData.map(m => ({
+      const formattedMessages = messagesData.map((m) => ({
         _id: m._id || new Date(m.created_at).getTime(),
-        text: typeof m.content === 'object' ? m.content.text : m.content, // 'content'가 객체면 'text' 필드 사용
+        text: typeof m.content === "object" ? m.content.text : m.content, // 'content'가 객체면 'text' 필드 사용
         createdAt: new Date(m.created_at),
         user: {
-          _id: m.sender === 'user' ? "user" : "assistant",
+          _id: m.sender === "user" ? "user" : "assistant",
         },
       }));
       setMessages(formattedMessages);
     } catch (error) {
-      console.error('Error fetching chat info:', error);
+      console.error("Error fetching chat info:", error);
     }
   };
 
   // 서버로부터 메시지를 받았을 때 호출될 함수
   const onMessageReceived = useCallback((newMessage) => {
-    console.log('New message received:', newMessage); // Add log for debugging
+    console.log("New message received:", newMessage); // Add log for debugging
 
     // 메시지 데이터가 올바른 형식인지 검증하고 변환
     const formattedMessage = {
@@ -46,52 +55,52 @@ function Chat({ route, navigation }) {
       text: newMessage.content,
       createdAt: new Date(),
       user: {
-        _id: newMessage.sender === 'user' ? 'user' : 'assistant',// 'user'는 1, 'assistant'는 2로 가정
-        name: newMessage.sender === 'user' ? 'User' : 'Assistant',
+        _id: newMessage.sender === "user" ? "user" : "assistant", // 'user'는 1, 'assistant'는 2로 가정
+        name: newMessage.sender === "user" ? "User" : "Assistant",
       },
     };
 
-    setMessages(previousMessages => GiftedChat.append(previousMessages, formattedMessage));
+    setMessages((previousMessages) =>
+      GiftedChat.append(previousMessages, formattedMessage)
+    );
   }, []);
 
   useEffect(() => {
     const fetchAccessTokenAndStars = async () => {
       const accessToken = await getAccessTokenFromHeader();
       if (!accessToken) {
-        console.log('No access token found');
-        navigation.navigate('Login');
+        console.log("No access token found");
+        navigation.navigate("Login");
       }
     };
     fetchAccessTokenAndStars();
     fetchChatInfo();
-    const imagePath = `${FileSystem.cacheDirectory}${star_id}.jpg`;
-    setStarImg(imagePath);
 
     const backAction = () => {
       navigation.goBack();
       return true;
     };
-  
-    BackHandler.addEventListener('hardwareBackPress', backAction);
-  
+
+    BackHandler.addEventListener("hardwareBackPress", backAction);
+
     // 두 로직의 클린업(청소) 함수를 반환
     return () => {
-      BackHandler.removeEventListener('hardwareBackPress', backAction);
+      BackHandler.removeEventListener("hardwareBackPress", backAction);
     };
-
   }, [starId, navigation]);
 
   const fetchStars = async (accessToken) => {
     try {
       const response = await fetch(`${API_URL}/stars`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
       });
       const json = await response.json();
-      const matchedStar = json.stars.find((s) => s.star_id === starId); if (matchedStar) {
+      const matchedStar = json.stars.find((s) => s.star_id === starId);
+      if (matchedStar) {
         setStarImg(matchedStar.image);
       }
     } catch (error) {
@@ -99,133 +108,144 @@ function Chat({ route, navigation }) {
     }
   };
 
-  const { isConnected, sendMessage, receiveMessage } = useSocket(starId, onMessageReceived);
+  const { isConnected, sendMessage, receiveMessage } = useSocket(
+    starId,
+    onMessageReceived
+  );
 
-  const onSend = useCallback((newMessages = []) => {
-    newMessages.forEach(message => {
-      console.log('Sending message:', message); // Add log for debugging
-      const messageData = message.text; // Ensure the format matches the backend expectation
-      if (isConnected) {
-        sendMessage(messageData);
-      } else {
-        console.error("WebSocket is not connected");
-      }
-    });
-    setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages));
-  }, [isConnected, sendMessage]);
-
+  const onSend = useCallback(
+    (newMessages = []) => {
+      newMessages.forEach((message) => {
+        console.log("Sending message:", message); // Add log for debugging
+        const messageData = message.text; // Ensure the format matches the backend expectation
+        if (isConnected) {
+          sendMessage(messageData);
+        } else {
+          console.error("WebSocket is not connected");
+        }
+      });
+      setMessages((previousMessages) =>
+        GiftedChat.append(previousMessages, newMessages)
+      );
+    },
+    [isConnected, sendMessage]
+  );
 
   // Render functions for customizing the chat bubbles and timestamps
-  const renderBubble = props => (
+  const renderBubble = (props) => (
     <Bubble
       {...props}
       wrapperStyle={{
-        right: { backgroundColor: '#3D9F88' },
-        left: { backgroundColor: '#92C3D2' },
+        right: { backgroundColor: "#3D9F88" },
+        left: { backgroundColor: "#92C3D2" },
       }}
       textStyle={{
-        right: { color: '#333' },
-        left: { color: '#333' },
+        right: { color: "#333" },
+        left: { color: "#333" },
       }}
       timeTextStyle={{
-        right: { color: '#333' },
-        left: { color: '#333' },
+        right: { color: "#333" },
+        left: { color: "#333" },
       }}
     />
   );
 
-  const renderTime = props => (
-    <Time {...props} />
-  );
+  const renderTime = (props) => <Time {...props} />;
 
   const renderAvatar = (props) => {
-    const imageSource = props.currentMessage.user._id === 'assistant' && starImg ? { uri: starImg } : defaultStarImg;
-    return (
 
-      props.currentMessage.user._id === 'assistant' ? (
-        <Image
-          source={imageSource}
-          style={{ width: 36, height: 36, borderRadius: 18 }}
-        />
-      ) : null
-    )
-  }
+    let imageSource = starImg ? { uri: starImg } : defaultStarImg;
 
-  const playSound = (audioUrl) => {
-    const sound = new Sound(audioUrl, null, (error) => {
-      if (error) {
-        console.log('오디오 파일 로딩 실패:', error);
-        return;
-      }
-      sound.play((success) => {
-        if (!success) {
-          console.log('오디오 재생 실패:', error);
-        }
-      });
-    });
+    console.log(imageSource)
+    return props.currentMessage.user._id === "assistant" ? (
+      <Image
+        source={imageSource}
+        style={{ width: 36, height: 36, borderRadius: 18 }}
+      />
+    ) : null;
   };
 
+  async function playSound(url) {
+    try {
+      // Audio.Sound 객체 생성
+      const sound = new Audio.Sound();
+      console.log("Audio에 등록")
+      // URL을 이용해 오디오 로드
+      console.log("url : ", url)
+      await sound.loadAsync({ uri: url });
+      console.log("url : ", url)
+      // 소리 재생
+      await sound.playAsync();
+    } catch (error) {
+      console.error("재생 중 에러 발생:", error);
+    }
+  }
+  
   async function sendVoiceMessage(message) {
     try {
       const accessToken = await getAccessTokenFromHeader();
       const response = await fetch(`${API_URL}/chat/play-voice/${star_id}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ text: message.text }),
       });
-
-      if (!response.ok) {
-        throw new Error('API 호출 실패');
-      }
-
-      const responseData = await response.json();
-      console.log('Response OK:', response.ok);
-      console.log('Voice message sent:', responseData);
-
-      if (responseData.audio_url) {
-        setCloningData(responseData.audio_url);
-      }
-
+  
+      // 응답에서 오디오 URL을 받음
+      const audioUrl = await response.json();
+      
+      // 오디오 URL로 재생
+      playSound(audioUrl);
     } catch (error) {
-      console.error('Error sending voice message:', error);
+      console.error("Error receiving audio:", error);
     }
-  }
+  }  
 
   function onLongPress(context, message) {
-    const options = ['목소리 듣기', '복사하기', '취소'];
+    const options = ["목소리 듣기", "복사하기", "취소"];
     const cancelButtonIndex = options.length - 1;
 
-    context.actionSheet().showActionSheetWithOptions(
-      { options, cancelButtonIndex },
-      (buttonIndex) => {
-        if (buttonIndex === 0) {
-          sendVoiceMessage(message);
-        } else if (buttonIndex === 1) {
-          Clipboard.setString(message.text);
+    context
+      .actionSheet()
+      .showActionSheetWithOptions(
+        { options, cancelButtonIndex },
+        (buttonIndex) => {
+          if (buttonIndex === 0) {
+            sendVoiceMessage(message);
+            // playSound(cloningData);
+          } else if (buttonIndex === 1) {
+            Clipboard.setString(message.text);
+          }
         }
-      }
-    );
+      );
   }
 
   return (
-    <ImageBackground style={styles.wrapper} source={require('../assets/img/background.png')}>
-      <StatusBar style='light' />
+    <ImageBackground
+      style={styles.wrapper}
+      source={require("../assets/img/background.png")}
+    >
+      <StatusBar style="light" />
       <View style={styles.logo}>
-        <Image source={require('../assets/img/title.png')} style={styles.topImage} />
+        <Image
+          source={require("../assets/img/title.png")}
+          style={styles.topImage}
+        />
       </View>
       <GiftedChat
         messages={messages}
-        onSend={newMessages => onSend(newMessages)}
-        user={{ _id: 'user' || 'assistant' }}
+        onSend={(newMessages) => onSend(newMessages)}
+        user={{ _id: "user" || "assistant" }}
         renderBubble={renderBubble}
         renderTime={renderTime}
         renderAvatar={renderAvatar}
         onLongPress={(context, message) => onLongPress(context, message)}
       />
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      />
     </ImageBackground>
   );
 }
@@ -236,8 +256,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     // 로고 스타일
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     height: 100,
     marginTop: 30,
   },
@@ -245,9 +265,8 @@ const styles = StyleSheet.create({
     // 상단 이미지 스타일
     width: 200,
     height: 50,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
 });
-
 
 export default Chat;
