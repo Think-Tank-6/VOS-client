@@ -344,7 +344,12 @@ const handleFirstModalSubmit = () => {
                 </View>
                 
             <View style={styles.uploadWarp}>
-              <Text style={styles.audioFileName}>{renderAudioFileName()}</Text>
+              <Text style={styles.audioFileName}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                    >
+                      {renderAudioFileName()}
+              </Text>
               <TouchableOpacity
                 style={styles.modalUploadButton}
                 onPress={selectAudioFile}
@@ -477,7 +482,10 @@ const handleFirstModalSubmit = () => {
           <Text style={styles.label}>생년월일</Text>
           <View style={styles.datePickerContainer}>
             <TouchableOpacity style={styles.datePickerButton} onPress={showBirthDatepicker}>
-             
+            <Text style={styles.datePickerText}>
+              {birthDateSelected ? formatDate(birthDate) : "생년월일 선택"}
+            </Text>
+                  
             </TouchableOpacity>
             {showBirthDatePicker && (
               <DateTimePicker
@@ -492,7 +500,10 @@ const handleFirstModalSubmit = () => {
           <Text style={styles.label}>타계일</Text>
           <View style={styles.datePickerContainer}>
             <TouchableOpacity style={styles.datePickerButton} onPress={showDeceaseDatepicker}>
-              
+            <Text style={styles.datePickerText}>
+              {birthDateSelected ? formatDate(deceaseDate) : "생년월일 선택"}
+            </Text>
+                      
             </TouchableOpacity>
             {showDeceaseDatePicker && (
               <DateTimePicker
@@ -690,11 +701,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 5,
-    color: '#DBDBDB',
+    color: 'white',
     backgroundColor:'gray',
   },
   datePickerText: {
-    color: "#B1B1B1",
+    color: "white",
     fontSize: 11,
   },
   centeredView: {
@@ -809,8 +820,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   radioSelected: {
-    backgroundColor: "#7f7b7b",
-    borderColor: "#7f7b7b",
+    backgroundColor: "#3C61E5",
+    borderColor: "#3C61E5",
     borderWidth: 1,
     borderRadius: 10,
     width: 20,
@@ -831,7 +842,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   radioInner: {
-    backgroundColor: "#7f7b7b",
+    backgroundColor: "#3C61E5",
     borderRadius: 5,
     width: 10,
     height: 10,
@@ -867,7 +878,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     },
     TextFileName: {
-      color: '#2A2826', 
+      color: 'white', 
       fontSize: 14, 
       margin:13, 
       textAlign: 'center',

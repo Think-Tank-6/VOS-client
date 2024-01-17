@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Alert, SafeAreaView,BackHandler, } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Alert, SafeAreaView,BackHandler, TouchableOpacity } from 'react-native';
 import { API_URL } from '@env';
 
 function Pwupdate({ route, navigation }) {
@@ -84,7 +84,11 @@ function Pwupdate({ route, navigation }) {
                     />
                     {/* 에러 메시지 표시 */}
                     {error ? <Text style={styles.errorText}>{error}</Text> : null}
-                    <Button title="변경 완료" onPress={handleSubmit} />
+                    {/* <Button title="변경 완료" onPress={handleSubmit} /> */}
+
+                    <TouchableOpacity onPress={handleSubmit} style={styles.button}>
+                      <Text style={styles.buttonText}>변경 완료</Text>
+                    </TouchableOpacity>
                 </View>
             </SafeAreaView>
         </ImageBackground>
@@ -116,13 +120,12 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
-        marginTop: 10,
+        marginVertical: 5,
         color: 'white'
     },
     input: {
         height: 40,
-        borderColor: 'white',
-        borderWidth: 1,
+        backgroundColor:'#d9d9d97a',
         marginBottom: 10,
         padding: 10,
         borderRadius: 5,
@@ -138,10 +141,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     button: {
-        padding: 10,
-        backgroundColor: 'white',
+        padding: 13,
+        backgroundColor: 'rgb(61,159,136)',
         borderRadius: 5,
-        marginLeft: 10,
+        alignItems: 'center',
+        marginTop:15
     },
     checkboxContainer: {
         flexDirection: 'row',
@@ -152,6 +156,9 @@ const styles = StyleSheet.create({
         marginLeft: 8,
         color: 'white',
     },
+    buttonText:{
+        color:'white'
+    }
 });
 
 
