@@ -26,7 +26,6 @@ const UserList = ({ navigation }) => {
   };
 
   useEffect(() => {
-    console.log('Filtered Member List:', filteredMemberList);
     fetchUsers(currentPage);
   }, [currentPage]);
 

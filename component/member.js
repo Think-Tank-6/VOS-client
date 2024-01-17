@@ -90,7 +90,6 @@ function Member({ route, navigation }) {
       }
 
       const json = await response.json();
-      console.log('업로드 성공:', json);
     } catch (error) {
       console.error('이미지 업로드 에러:', error);
     }

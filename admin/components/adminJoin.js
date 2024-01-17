@@ -40,7 +40,6 @@ function AdminJoin({ navigation }) {
       });
       
       if (response.ok) {
-        console.log('Response:', response);
         // 회원가입 성공 시
         Alert.alert("회원가입 성공", "회원가입이 완료되었습니다.");
         navigation.navigate('login');

@@ -32,12 +32,10 @@ function StarList({ navigation }) {
         useCallback(() => {
             const fetchAccessTokenAndStars = async () => {
                 const accessToken = await getAccessTokenFromHeader();
-                console.log(accessToken)
                 if (accessToken) {
                     fetchStars(accessToken);
                     setAccessToken(accessToken)
                 } else {
-                    console.log('No access token found');
                     navigation.navigate('Main');
                 }
             };

@@ -35,14 +35,11 @@ const KakaoLogin = ({ navigation }) => {
                 code,
             };
 
-            console.log('Requesting token with params:', tokenRequestParams);
-
             const response = await axios.post("https://kauth.kakao.com/oauth/token", null, {
                 params: tokenRequestParams,
             });
 
             const accessToken = response.data.access_token;
-            console.log('Received accessToken:', accessToken);
             sendTokenToServer(accessToken);
         } catch (error) {
             console.error('Error requesting token:', error.response ? error.response.data : error);
@@ -63,7 +60,6 @@ const KakaoLogin = ({ navigation }) => {
 
             if (response.ok) {
                 const jsonResponse = await response.json();
-                console.log("Server Response:", jsonResponse);
                 handleLoginResponse(jsonResponse);
             } else {
                 console.error('Login Failed:', response.statusText);

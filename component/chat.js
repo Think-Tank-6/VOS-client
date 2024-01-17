@@ -47,7 +47,6 @@ function Chat({ route, navigation }) {
 
   // 서버로부터 메시지를 받았을 때 호출될 함수
   const onMessageReceived = useCallback((newMessage) => {
-    console.log("New message received:", newMessage); // Add log for debugging
 
     // 메시지 데이터가 올바른 형식인지 검증하고 변환
     const formattedMessage = {
@@ -69,7 +68,6 @@ function Chat({ route, navigation }) {
     const fetchAccessTokenAndStars = async () => {
       const accessToken = await getAccessTokenFromHeader();
       if (!accessToken) {
-        console.log("No access token found");
         navigation.navigate("Login");
       }
     };
@@ -116,7 +114,6 @@ function Chat({ route, navigation }) {
   const onSend = useCallback(
     (newMessages = []) => {
       newMessages.forEach((message) => {
-        console.log("Sending message:", message); // Add log for debugging
         const messageData = message.text; // Ensure the format matches the backend expectation
         if (isConnected) {
           sendMessage(messageData);
@@ -156,7 +153,6 @@ function Chat({ route, navigation }) {
 
     let imageSource = starImg ? { uri: starImg } : defaultStarImg;
 
-    console.log(imageSource)
     return props.currentMessage.user._id === "assistant" ? (
       <Image
         source={imageSource}
@@ -169,11 +165,8 @@ function Chat({ route, navigation }) {
     try {
       // Audio.Sound 객체 생성
       const sound = new Audio.Sound();
-      console.log("Audio에 등록")
       // URL을 이용해 오디오 로드
-      console.log("url : ", url)
       await sound.loadAsync({ uri: url });
-      console.log("url : ", url)
       // 소리 재생
       await sound.playAsync();
     } catch (error) {

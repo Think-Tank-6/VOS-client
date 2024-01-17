@@ -23,7 +23,6 @@ const AdminList = () => {
   };
 
   useEffect(() => {
-    console.log('Filtered Member List:', filteredMemberList);
     fetchAdmins(currentPage);
   }, [currentPage]);
 

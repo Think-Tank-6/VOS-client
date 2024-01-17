@@ -44,7 +44,6 @@ const UserDetail = ({ route }) => {
       });
 
       if (response.ok) {
-        console.log('User status updated');
         // fetchUserDetails();
       } else {
         throw new Error(`Error: ${response.status}`);
