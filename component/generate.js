@@ -132,45 +132,6 @@ const handleProceedWithoutVoice = () => {
 
   let response;
 
-  // txt 파일 선택 함수
-  // const selectTextFile = async () => {
-  //   try {
-  //     const result = await DocumentPicker.getDocumentAsync({
-  //       type: 'text/*', // 텍스트 파일만 선택
-  //     });
-  //       console.log('Selected Text File: ', result);
-  //       setSelectedTextFile(result);
-
-  //     if (result.assets && result.assets.length > 0) {
-  //       const uri = result.assets[0].uri;
-  //       if (typeof uri === 'string') {
-  //         const uriParts = uri.split('.');
-  //         const fileType = uriParts[uriParts.length - 1];
-  
-  //         console.log("폼데이타 직전");
-  //         const formData = new FormData();
-  //         formData.append('original_text_file', {
-  //           uri: uri, 
-  //           type: `text/${fileType}`, 
-  //           name: result.name || `text.${fileType}`,
-  //         })
-  //       }
-  //       }
-       
-      // 파일의 내용을 읽습니다.
-      // FileSystem.readAsStringAsync(result.assets[0].uri)
-      // .then(fileContent => {
-      //   console.log('File content read successfully');
-      //   setSelectedTextFile({ content: fileContent, name: result.assets[0].name });
-      // })
-      // .catch(error => {
-      //   console.error('Error reading text file content: ', error);
-      // });
-      
-  //   } catch (error) {
-  //     console.error('Error picking a text file: ', error);
-  //   }
-  // };
   const selectTextFile = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
@@ -440,7 +401,12 @@ const handleProceedWithoutVoice = () => {
                 </View>
                 
             <View style={styles.uploadWarp}>
-              <Text style={styles.audioFileName}>{renderAudioFileName()}</Text>
+              <Text style={styles.audioFileName}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                    >
+                      {renderAudioFileName()}
+              </Text>
               <TouchableOpacity
                 style={styles.modalUploadButton}
                 onPress={selectAudioFile}
@@ -573,7 +539,10 @@ const handleProceedWithoutVoice = () => {
           <Text style={styles.label}>생년월일</Text>
           <View style={styles.datePickerContainer}>
             <TouchableOpacity style={styles.datePickerButton} onPress={showBirthDatepicker}>
-             
+            <Text style={styles.datePickerText}>
+              {birthDateSelected ? formatDate(birthDate) : "생년월일 선택"}
+            </Text>
+                  
             </TouchableOpacity>
             {showBirthDatePicker && (
               <DateTimePicker
@@ -588,7 +557,10 @@ const handleProceedWithoutVoice = () => {
           <Text style={styles.label}>타계일</Text>
           <View style={styles.datePickerContainer}>
             <TouchableOpacity style={styles.datePickerButton} onPress={showDeceaseDatepicker}>
-              
+            <Text style={styles.datePickerText}>
+              {birthDateSelected ? formatDate(deceaseDate) : "생년월일 선택"}
+            </Text>
+                      
             </TouchableOpacity>
             {showDeceaseDatePicker && (
               <DateTimePicker
@@ -786,11 +758,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 5,
-    color: '#DBDBDB',
+    color: 'white',
     backgroundColor:'gray',
   },
   datePickerText: {
-    color: "#B1B1B1",
+    color: "white",
     fontSize: 11,
   },
   centeredView: {
@@ -914,8 +886,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   radioSelected: {
-    backgroundColor: "#7f7b7b",
-    borderColor: "#7f7b7b",
+    backgroundColor: "#3C61E5",
+    borderColor: "#3C61E5",
     borderWidth: 1,
     borderRadius: 10,
     width: 20,
@@ -936,7 +908,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   radioInner: {
-    backgroundColor: "#7f7b7b",
+    backgroundColor: "#3C61E5",
     borderRadius: 5,
     width: 10,
     height: 10,
@@ -972,7 +944,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     },
     TextFileName: {
-      color: '#2A2826', 
+      color: 'white', 
       fontSize: 14, 
       margin:13, 
       textAlign: 'center',

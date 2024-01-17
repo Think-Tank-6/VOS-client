@@ -91,9 +91,9 @@ function Delete({ route, navigation }) {
 
 const styles = StyleSheet.create({
   deleteBtn:{
-    backgroundColor:'gray',
+    backgroundColor:'rgb(61,159,136)',
     borderRadius:5,
-    padding:2,
+    padding:5,
     marginTop:10
   },
  
