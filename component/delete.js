@@ -108,15 +108,15 @@ const styles = StyleSheet.create({
       padding: 20,
     },
     titleImageImage: {
-      width: '100%', // 이미지의 가로 크기를 조정합니다.
-      height: '100%', // 이미지의 세로 크기를 조정합니다. 원하는 비율로 조정하세요.
-      resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
+      width: '100%', 
+      height: '100%', 
+      resizeMode: 'contain', 
       marginTop: 20,
     },
-    formContainer: { // 중앙 정렬을 위한 새로운 스타일
-      flex: 2, // flex 값을 조정하여 화면에 맞게 크기를 조절할 수 있습니다.
-      width: '80%', // 이 부분은 부모 뷰의 가로 크기의 80%를 차지하게 합니다.
-      alignSelf: 'center', // 부모 뷰의 중앙에 위치하게 합니다.
+    formContainer: { 
+      flex: 2, 
+      width: '80%', 
+      alignSelf: 'center', 
       justifyContent: 'center',
     },
     label: {

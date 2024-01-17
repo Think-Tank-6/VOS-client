@@ -30,10 +30,10 @@ const styles = StyleSheet.create({
     paddingVertical: 50, // 상하 간격을 추가
   },
   titleImage: {
-    width: '80%', // 이미지의 가로 크기를 조정합니다.
-    height: '30%', // 이미지의 세로 크기를 조정합니다. 원하는 비율로 조정하세요.
-    resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
-    marginTop: 20, // 이미지의 상단 간격을 조정합니다.
+    width: '80%', 
+    height: '30%',
+    resizeMode: 'contain',
+    marginTop: 20,
   },
 });
 

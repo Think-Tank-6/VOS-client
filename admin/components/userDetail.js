@@ -7,20 +7,6 @@ const UserDetail = ({ route }) => {
   const { user } = route.params;
   const [userDetails, setUserDetails] = useState({});
 
-  // const fetchUserDetails = async () => {
-  //   try {
-  //     const response = await fetch(`http://172.20.144.1:8000/admin/user-list/${user.user_id}`);
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       setUserDetails(data);
-  //     } else {
-  //       console.error('Failed to fetch user details');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //   }
-  // };
-
   useEffect(() => {
 
     fetch(`${API_URL}/admin/user-list/${user.user_id}`)
@@ -43,7 +29,6 @@ const UserDetail = ({ route }) => {
       });
 
       if (response.ok) {
-        console.log('User status updated');
         fetchUserDetails(); 
       } else {
         throw new Error(`Error: ${response.status}`);
@@ -85,13 +70,6 @@ const UserDetail = ({ route }) => {
   const displayInfo = (info) => {
     return info || ' '; // 빈 정보가 있는 경우 대체 텍스트
   };
-
-  // const displayPassword = (password, maxLength = 15) => {
-  //   if (password && password.length > maxLength) {
-  //     return `${password.substring(0, maxLength)}...`;
-  //   }
-  //   return password;
-  // };
  
   return (
     

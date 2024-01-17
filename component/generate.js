@@ -57,24 +57,11 @@ const Generate = ({ closeModal }) => {
   };
   // 두번째 모달 열기
 const handleFirstModalSubmit = () => {
-  console.log("Closing first modal and opening second modal");
   setIsModalVisible(false);
   setIsSecondModalVisible(true);
 };
 
-// 두번째 모달 닫기
-const handleSecondModalSubmit = () => {
-  setIsSecondModalVisible(false);
-};
-
-// 음성추가 안하고 돌아가기
-const handleProceedWithoutVoice = () => {
-  closeModal(); 
-  navigation.navigate('StarList');
-};
-
   useEffect(() => {
-    console.log("Selected speaker ID:", selectedSpeakerId);
   }, [selectedSpeakerId]);
 
   // 성별 선택
@@ -137,7 +124,6 @@ const handleProceedWithoutVoice = () => {
       const result = await DocumentPicker.getDocumentAsync({
         type: "text/*", // 텍스트 파일만 선택
       });
-          console.log('Selected Text File: ', result.assets[0]);
           setSelectedTextFile({
             blob: result.assets[0].uri, 
             name: result.assets[0].name,
@@ -159,21 +145,11 @@ const handleProceedWithoutVoice = () => {
     const accessToken = await getAccessTokenFromHeader();
 
     if (!accessToken) {
-      console.log("Access token is missing");
       setLoading(false);
       return;
     }
     const formData = new FormData();
 
-    console.log("Sending data:", {
-      star_name: name,
-      gender: gender,
-      birth: birthDate.toISOString().split("T")[0],
-      death_date: deceaseDate.toISOString().split("T")[0],
-      relationship: relationship,
-      persona: feature,
-      original_text_file: selectedTextFile,
-    });
     formData.append("star_name", name);
     formData.append("gender", gender);
     formData.append("birth", birthDate.toISOString().split("T")[0]);
@@ -182,22 +158,17 @@ const handleProceedWithoutVoice = () => {
     formData.append("persona", feature);
 
     if (selectedTextFile) {
-      console.log("selectedTextFile", selectedTextFile);
       const file = {
         uri: selectedTextFile.blob,
         type: selectedTextFile.type,
         name: selectedTextFile.name,
       };
-      console.log("file", file);
       formData.append("original_text_file", file);
     } else {
-        console.log("else문 진입!")
-      console.log('Text file is missing');
       setLoading(false);
       return;
     }
     try {
-      console.log("try");
       const response = await fetch(`${API_URL}/stars`, {
         method: "POST",
         headers: {
@@ -207,10 +178,8 @@ const handleProceedWithoutVoice = () => {
         body: formData,
       });
       const jsonResponse = await response.json();
-      console.log(jsonResponse);
       if (response.ok) {
         // 서버 응답 처리, 스타 생성 성공
-        console.log(jsonResponse);
         setStarId(jsonResponse.star_id);
         openModal();
       } else {
@@ -234,16 +203,10 @@ const handleProceedWithoutVoice = () => {
     const accessToken = await getAccessTokenFromHeader();
 
    if (!accessToken) {
-     console.log('Access token is missing');
      setLoading(false);
      return;
    }
   const formData = new FormData();
-  console.log('1', selectedSpeakerId); // str
-  console.log('2', typeof JSON.stringify(full_speech_list)); // str
-  console.log('3', typeof original_voice_base64); // str
-
-
   
   formData.append('selected_speaker_id', selectedSpeakerId);
   formData.append('speech_list', JSON.stringify(full_speech_list));
@@ -254,20 +217,13 @@ const handleProceedWithoutVoice = () => {
       headers: {
         'Authorization': `Bearer ${accessToken}`, // 인증 토큰이 필요한 경우
         'Content-Type': 'multipart/form-data',
-        // 'Content-Type': 'application/json',
       },
       body: formData,
-      // body : { selected_speaker_id: selectedSpeakerId, 
-      //           speech_list: JSON.stringify(full_speech_list),
-      //           original_voice_base64: original_voice_base64,
-      //         },
     });
-    console.log('sdfsdfdsfdsf');
 
     const jsonResponse = await response.json();
 
     if (response.ok) {
-      console.log('Voice selection submitted successfully:', jsonResponse);
 
     } else {
       console.error('Failed to submit voice selection:', jsonResponse);
@@ -285,29 +241,21 @@ const handleProceedWithoutVoice = () => {
     const accessToken = await getAccessTokenFromHeader();
 
     if (!accessToken) {
-      console.log("Access token is missing");
       setLoading(false);
       return;
     }
 
   try {
-    console.log("select start");
     const result = await DocumentPicker.getDocumentAsync({
       type: 'audio/*', // 오디오 파일만 선택
     });
-    console.log("select complete");
-    console.log('Selected Audio File: ', result);
     setSelectedAudioFile(result);
-
-    console.log("오디오 파일 업데이트");
 
     if (result.assets && result.assets.length > 0) {
       const uri = result.assets[0].uri;
       if (typeof uri === 'string') {
         const uriParts = uri.split('.');
         const fileType = uriParts[uriParts.length - 1];
-
-        console.log("폼데이타 직전");
         const formData = new FormData();
         formData.append('original_voice_file', {
           uri: uri, 
@@ -316,7 +264,6 @@ const handleProceedWithoutVoice = () => {
         });
 
         try {
-          console.log('Sending request to backend...');
           const response = await fetch(`${API_URL}/stars/voice-upload`, {
             method: 'POST',
             headers: {
@@ -325,12 +272,8 @@ const handleProceedWithoutVoice = () => {
             },
             body: formData,
           });
-          console.log('response', response);
-          console.log("여기서 안댐")
           const jsonResponse = await response.json();
-          console.log('Response OK:', response.ok);
           setSpeakerData(jsonResponse);
-          // console.log('JSON Response:', jsonResponse);
         } catch (error) {
           console.error('Error uploading audio file:', error);
         }
@@ -767,8 +710,6 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
   },
   speakerWarp: {
     height: "50%",
@@ -786,13 +727,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-around",
     alignItems: "center",
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 3.84,
     elevation: 5,
   },
   modalText: {

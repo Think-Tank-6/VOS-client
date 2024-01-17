@@ -11,7 +11,6 @@ const useSocket = (starID, externalOnMessageReceived) => {
 
     websocket.onopen = () => {
       setIsConnected(true);
-      console.log('Connected to the WebSocket server');
     };
 
     websocket.onmessage = (event) => {
@@ -26,7 +25,6 @@ const useSocket = (starID, externalOnMessageReceived) => {
   };
   
   websocket.onclose = (event) => {
-      console.log('Disconnected from the WebSocket server:', event);
       setIsConnected(false);
   };
 

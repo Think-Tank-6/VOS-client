@@ -33,7 +33,6 @@ const UserDetail = ({ route }) => {
       const encodedUserId = encodeURIComponent(user_id);
       // PATCH 요청 URL
       const url = `http://172.20.144.1:8000/admin/user-status/${encodedUserId}`;
-      // const url = `http://172.20.144.1:8000/admin/user-status/${user_id}`;
 
       const response = await fetch(url, {
         method: 'PATCH',
@@ -44,8 +43,6 @@ const UserDetail = ({ route }) => {
       });
 
       if (response.ok) {
-        console.log('User status updated');
-        // fetchUserDetails();
       } else {
         throw new Error(`Error: ${response.status}`);
       }
@@ -86,13 +83,6 @@ const UserDetail = ({ route }) => {
   const displayInfo = (info) => {
     return info || ' '; // 빈 정보가 있는 경우 대체 텍스트
   };
-
-  // const displayPassword = (password, maxLength = 15) => {
-  //   if (password && password.length > maxLength) {
-  //     return `${password.substring(0, maxLength)}...`;
-  //   }
-  //   return password;
-  // };
  
   return (
     

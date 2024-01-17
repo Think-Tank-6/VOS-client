@@ -90,7 +90,6 @@ function Member({ route, navigation }) {
       }
 
       const json = await response.json();
-      console.log('업로드 성공:', json);
     } catch (error) {
       console.error('이미지 업로드 에러:', error);
     }
@@ -197,27 +196,24 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     color: 'white',
-    marginTop: 60, // 타이틀의 상단 간격을 조정
-  },
-  profileContainer: {
-    // 여기에 프로필 이미지 스타일을 추가
+    marginTop: 60,
   },
  
   addButtonContainer: {
-    height: 50, // 버튼의 높이
-    backgroundColor: '#007AFF', // 버튼의 배경색
-    justifyContent: 'center', // 버튼 내부 텍스트를 세로 방향으로 중앙에 위치
-    alignItems: 'center', // 버튼 내부 텍스트를 가로 방향으로 중앙에 위치
-    borderRadius: 25, // 버튼의 모서리를 둥글게
-    marginTop: 10, // 위에서부터의 마진
-    marginBottom: 20, // 아래에서부터의 마진
+    height: 50, 
+    backgroundColor: '#007AFF',
+    justifyContent: 'center', 
+    alignItems: 'center',
+    borderRadius: 25, 
+    marginTop: 10, 
+    marginBottom: 20,
   },
   button: {
-    backgroundColor: 'rgba(255, 255, 255, 0.3)', // 버튼의 배경색과 투명도 조정
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     paddingHorizontal: 30,
     paddingVertical: 10,
     borderRadius: 20,
-    marginTop: 20, // 버튼의 상단 간격을 조정
+    marginTop: 20,
   },
   buttonText: {
     color: 'white',
@@ -227,15 +223,15 @@ const styles = StyleSheet.create({
    
   },
   titleImage: {
-    width: '80%', // 이미지의 가로 크기를 조정합니다.
-    height: '30%', // 이미지의 세로 크기를 조정합니다. 원하는 비율로 조정하세요.
-    resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
-    marginTop: 20, // 이미지의 상단 간격을 조정합니다.
+    width: '80%', 
+    height: '30%',
+    resizeMode: 'contain',
+    marginTop: 20,
   },
   profileImage: {
     width: 100,
     height: 100,
-    borderRadius: 50, // 원형 이미지로 만들기 위함
+    borderRadius: 50,
   },
 
 });

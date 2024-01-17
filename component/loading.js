@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     display:'flex',
     height:'100%',
     alignContent:'space-between',
-    backgroundColor: '#2A2826', // 반투명 배경
+    backgroundColor: '#2A2826',
   },
   modalView: {
     margin: 20,

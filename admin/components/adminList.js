@@ -23,7 +23,6 @@ const AdminList = () => {
   };
 
   useEffect(() => {
-    console.log('Filtered Member List:', filteredMemberList);
     fetchAdmins(currentPage);
   }, [currentPage]);
 
@@ -180,7 +179,6 @@ const styles = StyleSheet.create({
   },
   itemText: {
     width: '16.6%',
-    // marginLeft: 20,
   },
   memberListItemHeader: {
     display: 'flex',

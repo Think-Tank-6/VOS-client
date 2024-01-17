@@ -3,8 +3,6 @@ import { View, StyleSheet, ImageBackground, Image, SafeAreaView, Text, Touchable
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Setting({ navigation }) {
-  const [selectedTab, setSelectedTab] = useState('MyPage');
-  const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [accessToken, setAccessToken] = useState(null); // accessToken 상태 추가
 
   useEffect(() => {
@@ -13,7 +11,6 @@ function Setting({ navigation }) {
         const token = await AsyncStorage.getItem('accessToken');
         if (token) {
           setAccessToken(token);
-          console.log('저장된 토큰:', token);
         }
       } catch (error) {
         console.error('Error fetching user info', error);
@@ -43,7 +40,6 @@ function Setting({ navigation }) {
   const handleLogout = async () =>{
     try{
       await AsyncStorage.removeItem('accessToken');
-      console.log('로그아웃 성공 : 토큰 삭제');
       navigation.navigate('Login');
     }catch(error){
       console.error('로그아웃 에러',error);
@@ -129,9 +125,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   userIdText: {
-    color: 'white', // 텍스트 색상
-    fontSize: 16, // 텍스트 크기
-    marginVertical: 10, // 상하 여백
+    color: 'white',
+    fontSize: 16,
+    marginVertical: 10,
   },
 });
 
