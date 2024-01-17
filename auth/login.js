@@ -101,9 +101,8 @@ function Login({ navigation }) {
                         onChangeText={setPassword}
                         secureTextEntry={true} // 비밀번호를 숨김
                     />
-                    <TouchableOpacity style={styles.addButtonContainerPW} onPress={onAddPress}>
-                        <Text style={styles.addText}>비밀번호 찾기</Text>
-                    </TouchableOpacity>
+                  <View style={styles.buttonWrap}>
+
                     <TouchableOpacity style={styles.addButtonContainer} onPress={onLoginPress}>
                         <Text style={styles.addLogin}>로그인</Text>
                     </TouchableOpacity>
@@ -113,6 +112,7 @@ function Login({ navigation }) {
                     <TouchableOpacity style={styles.kakaoButtonContainer} onPress={onKakaoLoginPress}>
                         <Text style={styles.kakaoButtonText}>카카오 로그인</Text>
                     </TouchableOpacity>
+                  </View>
                 </View>
             </SafeAreaView>
         </ImageBackground>
@@ -121,6 +121,9 @@ function Login({ navigation }) {
 
 
 const styles = StyleSheet.create({
+    buttonWrap: {
+        marginTop:45
+    },
     wrapper: {
         flex: 1,
     },
