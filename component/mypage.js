@@ -19,6 +19,13 @@ function MyPage({ route, navigation }) {
       />
 
       <Tab.Screen 
+        name="pwupdate" 
+        component={PwupdateComponent} 
+        initialParams={{ token: token }} 
+        options={{ title: '비밀번호 변경' }} 
+      />
+
+      <Tab.Screen 
         name="delete" 
         component={DeleteComponent} 
         initialParams={{ token: token }} 

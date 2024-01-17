@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     display:'flex',
     alignItems:'center',
     justifyContent:'space-around',
-    backgroundColor: 'gray',
+    backgroundColor: 'rgb(61,159,136)',
     borderRadius: 5,
   },
   checkboxContainer: {
