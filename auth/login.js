@@ -128,20 +128,20 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     topImageContainer: {
-        flex: 1, // 부모 View를 flex container로 만듭니다.
+        flex: 1,
 
-        alignItems: 'center', // 자식 요소를 가로 축의 가운데로 정렬합니다.
+        alignItems: 'center',
     },
     centerImage: {
-        width: '80%', // 이미지의 가로 크기를 조정합니다.
-        height: '30%', // 이미지의 세로 크기를 조정합니다. 원하는 비율로 조정하세요.
-        resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
+        width: '80%',
+        height: '30%',
+        resizeMode: 'contain',
         marginTop: 20,
     },
-    formContainer: { // 중앙 정렬을 위한 새로운 스타일
-        flex: 2, // flex 값을 조정하여 화면에 맞게 크기를 조절할 수 있습니다.
-        width: '80%', // 이 부분은 부모 뷰의 가로 크기의 80%를 차지하게 합니다.
-        alignSelf: 'center', // 부모 뷰의 중앙에 위치하게 합니다.
+    formContainer: {
+        flex: 2,
+        width: '80%',
+        alignSelf: 'center',
     },
     label: {
         fontSize: 16,
@@ -166,20 +166,20 @@ const styles = StyleSheet.create({
 
     },
     addLogin: {
-       fontSize: 16, // 텍스트 크기 조정
-       color: '#FFFFFF', // 텍스트 색상을 흰색으로
-       fontWeight: 'bold', // 글씨를 굵게
+       fontSize: 16,
+       color: '#FFFFFF', 
+       fontWeight: 'bold', 
     },
     addMember: {
-        fontSize: 16, // 텍스트 크기 조정
-        color: '#FFFFFF', // 텍스트 색상을 흰색으로
-        fontWeight: 'bold', // 글씨를 굵게
+        fontSize: 16, 
+        color: '#FFFFFF',
+        fontWeight: 'bold', 
      },
      addButtonContainerPW: {
-        justifyContent: 'flex-end', // 버튼 내부 텍스트를 세로 방향으로 중앙에 위치
-        alignItems: 'right', // 버튼 내부 텍스트를 가로 방향으로 중앙에 위치
-        marginTop: 20, // 위에서부터의 마진
-        marginBottom: 5, // 아래에서부터의 마진
+        justifyContent: 'flex-end', 
+        alignItems: 'right', 
+        marginTop: 20, 
+        marginBottom: 5,
         
      },
      addText: {
@@ -187,18 +187,18 @@ const styles = StyleSheet.create({
         color : 'white'
      },
      kakaoButtonContainer: {
-        height: 50, // Button height
-        backgroundColor: '#FEE500', // Kakao yellow color
-        justifyContent: 'center', // Vertically center the content
-        alignItems: 'center', // Horizontally center the content
-        borderRadius: 25, // Rounded corners
-        marginTop: 10, // Margin from the top
-        marginBottom: 20, // Margin from the bottom
+        height: 50,
+        backgroundColor: '#FEE500',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 25,
+        marginTop: 10,
+        marginBottom: 20,
     },
     kakaoButtonText: {
-        fontSize: 16, // Text size
-        color: '#000000', // Text color (black)
-        fontWeight: 'bold', // Bold text
+        fontSize: 16,
+        color: '#000000',
+        fontWeight: 'bold',
     },
     
 });

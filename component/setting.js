@@ -125,9 +125,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   userIdText: {
-    color: 'white', // 텍스트 색상
-    fontSize: 16, // 텍스트 크기
-    marginVertical: 10, // 상하 여백
+    color: 'white',
+    fontSize: 16,
+    marginVertical: 10,
   },
 });
 

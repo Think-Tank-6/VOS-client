@@ -217,13 +217,8 @@ const handleFirstModalSubmit = () => {
       headers: {
         'Authorization': `Bearer ${accessToken}`, // 인증 토큰이 필요한 경우
         'Content-Type': 'multipart/form-data',
-        // 'Content-Type': 'application/json',
       },
       body: formData,
-      // body : { selected_speaker_id: selectedSpeakerId, 
-      //           speech_list: JSON.stringify(full_speech_list),
-      //           original_voice_base64: original_voice_base64,
-      //         },
     });
 
     const jsonResponse = await response.json();
@@ -704,8 +699,6 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
   },
   speakerWarp: {
     height: "50%",
@@ -723,13 +716,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-around",
     alignItems: "center",
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 3.84,
     elevation: 5,
   },
   modalText: {

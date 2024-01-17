@@ -300,21 +300,21 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   topImageContainer: {
-    alignItems: 'center', // 자식 요소를 가로 축의 가운데로 정렬합니다.
+    alignItems: 'center', 
     justifyContent: 'center',
     height: 100,
     padding:20,
     marginTop:50,
   },
   centerImage: {
-    width: '100%', // 이미지의 가로 크기를 조정합니다.
-    height: '100%', // 이미지의 세로 크기를 조정합니다. 원하는 비율로 조정하세요.
-    resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
-  formContainer: { // 중앙 정렬을 위한 새로운 스타일
-    flex: 2, // flex 값을 조정하여 화면에 맞게 크기를 조절할 수 있습니다.
-    width: '80%', // 이 부분은 부모 뷰의 가로 크기의 80%를 차지하게 합니다.
-    alignSelf: 'center', // 부모 뷰의 중앙에 위치하게 합니다.
+  formContainer: {
+    flex: 2, 
+    width: '80%',
+    alignSelf: 'center',
   },
   scrollView: {
     flex: 1,
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#d9d9d97a',
     borderRadius: 5,
-    marginLeft: 10, // TextInput과의 간격
+    marginLeft: 10,
   },
   email: {
     width:'100%',
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     padding: 7,
     backgroundColor: 'white',
     borderRadius: 5,
-    marginLeft: 10, // TextInput과의 간격
+    marginLeft: 10,
    
   },
   joinBtn: {
@@ -441,11 +441,11 @@ const styles = StyleSheet.create({
   },
 
   modalView: {
-    width: '90%', // 모달의 가로 크기를 조절
+    width: '90%',
     height: 300,
     backgroundColor: '#2A2826',
     borderRadius: 20,
-    padding: 20, // 내부 패딩을 조절하여 내용물의 크기를 조절
+    padding: 20,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
 

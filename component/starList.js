@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경 설정
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
         width: '80%',
@@ -529,32 +529,32 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     modalTitle: {
-        fontSize: 20, // 제목의 글꼴 크기
-        fontWeight: 'bold', // 글꼴 굵기
-        marginBottom: 15, // 제목 아래 마진
-        textAlign: 'center', // 텍스트 중앙 정렬
-        color: 'white', // 텍스트 색상
+        fontSize: 20, 
+        fontWeight: 'bold', 
+        marginBottom: 15, 
+        textAlign: 'center',
+        color: 'white', 
     },
     input: {
-        borderWidth: 1, // 테두리 두께
-        borderColor: '#ddd', // 테두리 색상
-        padding: 10, // 패딩
-        borderRadius: 5, // 테두리 둥글기
-        marginBottom: 10, // 아래쪽 마진
-        fontSize: 16, // 글꼴 크기
+        borderWidth: 1, 
+        borderColor: '#ddd',
+        padding: 10, 
+        borderRadius: 5, 
+        marginBottom: 10, 
+        fontSize: 16,
         color: '#DBDBDB',
     },
     saveButton: {
-        backgroundColor: 'rgba(61,159,136,0.5)', // 배경 색상
-        padding: 10, // 패딩
-        borderRadius: 5, // 모서리 둥글기
-        justifyContent: 'center', // 중앙 정렬
-        alignItems: 'center', // 중앙 정렬
+        backgroundColor: 'rgba(61,159,136,0.5)', 
+        padding: 10, 
+        borderRadius: 5, 
+        justifyContent: 'center', 
+        alignItems: 'center',
     },
     saveButtonText: {
-        color: 'white', // 텍스트 색상
-        fontSize: 16, // 글꼴 크기
-        fontWeight: 'bold', // 글꼴 굵기
+        color: 'white', 
+        fontSize: 16, 
+        fontWeight: 'bold', 
     },
     editImg: {
         flexDirection: 'column',
@@ -566,8 +566,8 @@ const styles = StyleSheet.create({
         width: 70,
         height: 30,
         backgroundColor: 'rgba(61,159,136,0.5)', // 배경 색상 적용
-        justifyContent: 'center', // 중앙 정렬
-        alignItems: 'center', // 중앙 정렬
+        justifyContent: 'center', 
+        alignItems: 'center', 
         marginBottom: 15,
         marginTop: 5,
     },
