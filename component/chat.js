@@ -23,7 +23,6 @@ function Chat({ route, navigation }) {
   const { star_id } = route.params; // Extract star_id from navigation parameters
   const [starId, setStarId] = useState(star_id); // Use the passed star_id
   const [starImg, setStarImg] = useState(); // Use the passed star_id
-  const [cloningData, setCloningData] = useState(null);
 
   // Fetch initial chat messages
   const fetchChatInfo = async () => {
@@ -76,8 +75,6 @@ function Chat({ route, navigation }) {
     };
     fetchAccessTokenAndStars();
     fetchChatInfo();
-    const imagePath = `${FileSystem.cacheDirectory}${star_id}.jpg`;
-    setStarImg(imagePath);
 
     const backAction = () => {
       navigation.goBack();
@@ -156,10 +153,10 @@ function Chat({ route, navigation }) {
   const renderTime = (props) => <Time {...props} />;
 
   const renderAvatar = (props) => {
-    const imageSource =
-      props.currentMessage.user._id === "assistant" && starImg
-        ? { uri: starImg }
-        : defaultStarImg;
+
+    let imageSource = starImg ? { uri: starImg } : defaultStarImg;
+
+    console.log(imageSource)
     return props.currentMessage.user._id === "assistant" ? (
       <Image
         source={imageSource}
