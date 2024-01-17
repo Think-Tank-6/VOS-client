@@ -804,10 +804,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   modalWarp: {
-    height: "20%",
+    height: "auto",
     width: "100%",
-    display: "flex",
-    justifyContent: "space-around",
   },
   modalView: {
     backgroundColor: "#2A2826",

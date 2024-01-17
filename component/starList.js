@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { BackHandler, Dimensions, View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { BackHandler, Dimensions, View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import Generate from './generate';
