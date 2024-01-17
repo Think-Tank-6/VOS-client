@@ -145,26 +145,25 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
-        marginTop: 10,
+        marginVertical: 5,
         color : 'white'
     },
     input: {
        height: 40,
-       borderColor: 'white',
-       borderWidth: 1,
+       backgroundColor:'#d9d9d97a',
        marginBottom: 10,
        padding: 10,
-       borderRadius: 5,
+       borderRadius: 7,
        color : 'white',
      },
      addButtonContainer: {
-       height: 50, // 버튼의 높이
-       backgroundColor: '#007AFF', // 버튼의 배경색
-       justifyContent: 'center', // 버튼 내부 텍스트를 세로 방향으로 중앙에 위치
-       alignItems: 'center', // 버튼 내부 텍스트를 가로 방향으로 중앙에 위치
-       borderRadius: 25, // 버튼의 모서리를 둥글게
-       marginTop: 10, // 위에서부터의 마진
-       marginBottom: 20, // 아래에서부터의 마진
+       height: 50,
+       backgroundColor: '#007AF7', 
+       justifyContent: 'center', 
+       alignItems: 'center', 
+       marginVertical:5,
+       borderRadius: 15,
+
     },
     addLogin: {
        fontSize: 16, // 텍스트 크기 조정
