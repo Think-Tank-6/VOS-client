@@ -165,24 +165,22 @@ function Chat({ route, navigation }) {
     ) : null;
   };
 
-  async function playSound(base64) {
+  async function playSound(url) {
     try {
       // Audio.Sound 객체 생성
       const sound = new Audio.Sound();
-
-      // base64 문자열을 uri로 변환
-      const uri = `data:audio/wav;base64,${base64}`;
-
-      // 소리 로드
-      await sound.loadAsync({ uri });
-
+      console.log("Audio에 등록")
+      // URL을 이용해 오디오 로드
+      console.log("url : ", url)
+      await sound.loadAsync({ uri: url });
+      console.log("url : ", url)
       // 소리 재생
       await sound.playAsync();
     } catch (error) {
       console.error("재생 중 에러 발생:", error);
     }
   }
-
+  
   async function sendVoiceMessage(message) {
     try {
       const accessToken = await getAccessTokenFromHeader();
@@ -194,14 +192,16 @@ function Chat({ route, navigation }) {
         },
         body: JSON.stringify({ text: message.text }),
       });
-
-      const audioBase64 = await response.text();
-      // setCloningData(audioBase64);
-      playSound(audioBase64);
+  
+      // 응답에서 오디오 URL을 받음
+      const audioUrl = await response.json();
+      
+      // 오디오 URL로 재생
+      playSound(audioUrl);
     } catch (error) {
       console.error("Error receiving audio:", error);
     }
-  }
+  }  
 
   function onLongPress(context, message) {
     const options = ["목소리 듣기", "복사하기", "취소"];
