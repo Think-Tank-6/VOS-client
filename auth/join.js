@@ -148,7 +148,7 @@ function Join({ navigation }) {
           <Text style={styles.label}>아이디</Text>
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={styles.IdInput}
               value={emailPrefix}
               onChangeText={setEmailPrefix}
               placeholder="아이디 입력"
@@ -158,9 +158,17 @@ function Join({ navigation }) {
               style={styles.button}
               onPress={() => setModalVisible(true)}
             >
+              <Text style={styles.buttonText}>@</Text>
               <Text style={styles.buttonText}>
                 {emailDomain ? emailDomain : '이메일 선택'}
               </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.emailBtn}
+              onPress={handleCheckEmail}
+            >
+              <Text style={styles.emailText}>중복확인</Text>
             </TouchableOpacity>
           </View>
 
@@ -175,27 +183,36 @@ function Join({ navigation }) {
               style={styles.centeredView}
             >
               <View style={styles.modalView}>
-                <TextInput
-                  style={styles.input}
-                  value={customDomain}
-                  onChangeText={setCustomDomain}
-                  placeholder="직접 도메인 입력"
-                  keyboardType="email-address"
-                />
-                <Button title="도메인 적용(직접입력한도메인)" onPress={handleCustomDomainSubmit} />
-                <Button title="naver.com" onPress={() => selectDomain('naver.com')} />
-                <Button title="daum.net" onPress={() => selectDomain('daum.net')} />
-                <Button title="gmail.com" onPress={() => selectDomain('gmail.com')} />
+
+                <View style={styles.mailSelect}>
+                  <TextInput
+                    style={styles.mailInput}
+                    value={customDomain}
+                    onChangeText={setCustomDomain}
+                    placeholder="직접 도메인 입력"
+                    keyboardType="email-address"
+                  />
+                  <View style={styles.emailSelectBtn}>
+                    <TouchableOpacity onPress={handleCustomDomainSubmit} style={styles.button}>
+                      <Text style={styles.buttonText}>직접입력</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                   <TouchableOpacity onPress={() => selectDomain('naver.com')} style={styles.email} >
+                      <Text style={styles.buttonText}>naver.com</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => selectDomain('daum.net')} style={styles.email}>
+                      <Text style={styles.buttonText}>daum.net</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => selectDomain('gmail.com')} style={styles.email}>
+                      <Text style={styles.buttonText}>gmail.com</Text>
+                    </TouchableOpacity>
+               
               </View>
             </KeyboardAvoidingView>
           </Modal>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleCheckEmail}
-          >
-            <Text>중복확인</Text>
-          </TouchableOpacity>
+         
 
           <Text style={styles.label}>비밀번호</Text>
           <TextInput
@@ -249,7 +266,10 @@ function Join({ navigation }) {
             <Text style={styles.checkboxText}>[필수] 약관에 동의합니다.</Text>
           </View>
 
-          <Button title="회원가입" onPress={handleSubmit} disabled={isSignupDisabled} />
+         
+          <TouchableOpacity onPress={handleSubmit} disabled={isSignupDisabled} style={styles.joinBtn}>
+              <Text style={styles.buttonText}>회원가입</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </ImageBackground>
@@ -257,6 +277,18 @@ function Join({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  emailSelectBtn:{
+    height:40,
+    justifyContent:'center',
+    alignItems:'center'
+  },
+  buttonText:{
+    fontSize:14,
+    color:'white'
+  },
+  emailText:{
+    color:'gray'
+  },
   wrapper: {
     flex: 1,
   },
@@ -271,12 +303,13 @@ const styles = StyleSheet.create({
     alignItems: 'center', // 자식 요소를 가로 축의 가운데로 정렬합니다.
     justifyContent: 'center',
     height: 100,
+    padding:20,
+    marginTop:50,
   },
   centerImage: {
     width: '100%', // 이미지의 가로 크기를 조정합니다.
     height: '100%', // 이미지의 세로 크기를 조정합니다. 원하는 비율로 조정하세요.
     resizeMode: 'contain', // 이미지가 View에 맞춰서 비율을 유지하며 표시됩니다.
-    marginTop: 20,
   },
   formContainer: { // 중앙 정렬을 위한 새로운 스타일
     flex: 2, // flex 값을 조정하여 화면에 맞게 크기를 조절할 수 있습니다.
@@ -288,14 +321,37 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    marginTop: 10,
+    marginVertical: 7,
     color: 'white'
+  },
+  IdInput:{
+    flex:1.5,
+    height: 40,
+    backgroundColor:'#d9d9d97a',
+    padding: 10,
+    borderRadius: 5,
+    color: 'white'
+
   },
   input: {
     flex: 1,
     height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
+    backgroundColor:'#d9d9d97a',
+    marginBottom: 10,
+    marginRight: 10,
+    padding: 10,
+    borderRadius: 5,
+    color: 'white'
+  },
+  mailSelect:{
+    display:'flex',
+    flexDirection:'row',
+
+  },
+  mailInput: {
+    flex:2,
+    height:40,
+    backgroundColor:'#d9d9d97a',
     marginBottom: 10,
     marginRight: 10,
     padding: 10,
@@ -308,15 +364,56 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   inputContainer: {
+    display:'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent:'center'
+    
   },
   button: {
+    flex:1,
+    height: 40,
+    display:'flex',
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-around',
     padding: 10,
+    backgroundColor: '#d9d9d97a',
+    borderRadius: 5,
+    marginLeft: 10, // TextInput과의 간격
+  },
+  email: {
+    width:'100%',
+    height: 40,
+    marginVertical:5,
+    display:'flex',
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-around',
+    padding: 10,
+    backgroundColor: '#d9d9d97a',
+    borderRadius: 5,
+  },
+  emailBtn: {
+    height: 40,
+    display:'flex',
+    justifyContent:'center',
+    padding: 7,
     backgroundColor: 'white',
     borderRadius: 5,
     marginLeft: 10, // TextInput과의 간격
+   
+  },
+  joinBtn: {
+    flex:1,
+    height: 40,
+    marginTop:20,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'space-around',
+    backgroundColor: 'gray',
+    borderRadius: 5,
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -345,8 +442,8 @@ const styles = StyleSheet.create({
 
   modalView: {
     width: '90%', // 모달의 가로 크기를 조절
-    height: '50%', // 모달의 세로 크기를 조절
-    backgroundColor: 'black',
+    height: 300,
+    backgroundColor: '#2A2826',
     borderRadius: 20,
     padding: 20, // 내부 패딩을 조절하여 내용물의 크기를 조절
     alignItems: 'center',
@@ -364,7 +461,6 @@ const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
   },
 });

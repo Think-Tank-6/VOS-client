@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { BackHandler, View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
+import { BackHandler, Dimensions, View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import Generate from './generate';
@@ -7,6 +7,11 @@ import { API_URL } from '@env';
 import getAccessTokenFromHeader from '../hooks/getAccessTokenFromHeader';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+
 
 function StarList({ navigation }) {
     const [stars, setStars] = useState([]);
@@ -41,29 +46,28 @@ function StarList({ navigation }) {
     );
     
     useEffect(() => {
-        // 뒤로 가기 버튼을 눌렀을 때 호출될 함수 정의
-        const backAction = () => {
-            Alert.alert("앱 종료", "앱을 종료하시겠습니까?", [
-                {
-                    text: "취소",
-                    onPress: () => null,
-                    style: "cancel"
-                },
-                { text: "확인", onPress: () => BackHandler.exitApp() }
-            ]);
-            return true; // 이벤트를 여기서 처리했음을 나타냅니다.
-        };
-        
-        // 이벤트 리스너 등록
-        BackHandler.addEventListener('hardwareBackPress', backAction);
-        
-        // 컴포넌트 언마운트 시 이벤트 리스너 제거
-        return () => {
-            BackHandler.removeEventListener('hardwareBackPress', backAction);
-        };
-    }, []);
-
+       // 뒤로 가기 버튼을 눌렀을 때 호출될 함수 정의
+       const backAction = () => {
+        Alert.alert("앱 종료", "앱을 종료하시겠습니까?", [
+            {
+                text: "취소",
+                onPress: () => null,
+                style: "cancel"
+            },
+            { text: "확인", onPress: () => BackHandler.exitApp() }
+        ]);
+        return true; // 이벤트를 여기서 처리했음을 나타냅니다.
+    };
     
+    // 이벤트 리스너 등록
+    BackHandler.addEventListener('hardwareBackPress', backAction);
+    
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+        BackHandler.removeEventListener('hardwareBackPress', backAction);
+    };
+}, []);
+
     const fetchStars = async (accessToken) => {
         try {
             const response = await fetch(`${API_URL}/stars`, {
@@ -381,31 +385,37 @@ function StarList({ navigation }) {
     }
 
     return (
-        <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper}>
-            <StatusBar style='light' />
-            <View style={styles.logo}>
-                <Image source={require('../assets/img/title.png')} style={styles.topImage} />
-            </View>
-            {renderStars()}
-            <TouchableOpacity style={styles.settingsButton} onPress={navigateToMypage}>
-                <Image source={require('../assets/img/cog.png')} style={styles.settingsImage} />
-            </TouchableOpacity>
+        <>
+            <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper}>
+            
+                <StatusBar style='light' />
+                <View style={styles.logo}>
+                    <Image source={require('../assets/img/title.png')} style={styles.topImage} />
+                </View>
+                {renderStars()}
+                <TouchableOpacity style={styles.settingsButton} onPress={navigateToMypage}>
+                    <Image source={require('../assets/img/cog.png')} style={styles.settingsImage} />
+                </TouchableOpacity>
+            </ImageBackground>
+
             <Modal
                 animationType="slide"
                 transparent={true}
                 visible={modalVisible}
                 onRequestClose={handleCloseModal}
+                
             >
                 <View style={styles.centeredModalView}>
                     {modalVisible && <Generate closeModal={handleCloseModal} />}
                 </View>
             </Modal>
-        </ImageBackground>
+        </>
     );
 }
 
 const styles = StyleSheet.create({
-    topImage: {
+   
+      topImage: {
         width: 200,
         height: 50,
         resizeMode: 'contain',
@@ -425,9 +435,7 @@ const styles = StyleSheet.create({
     },
     centeredModalView: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 22,
+        backgroundColor:'#2A2826',
     },
     generateContainer: {
         width: '80%',

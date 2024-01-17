@@ -80,7 +80,9 @@ function Delete({ route, navigation }) {
                     />
                     {/* 에러 메시지 표시 */}
                     {error ? <Text style={styles.errorText}>{error}</Text> : null}
-                    <Button title="회원탈퇴" onPress={handleSubmit} />
+                    <View style={styles.deleteBtn}>
+                      <Button title="회원탈퇴" color={'white'} onPress={handleSubmit} />
+                    </View>
                 </View>
             </SafeAreaView>
         </ImageBackground>
@@ -88,6 +90,13 @@ function Delete({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+  deleteBtn:{
+    backgroundColor:'gray',
+    borderRadius:5,
+    padding:2,
+    marginTop:10
+  },
+ 
     wrapper: {
         flex: 1,
     },
@@ -112,12 +121,12 @@ const styles = StyleSheet.create({
     },
     label: {
       fontSize: 16,
-      marginTop: 10,
+      marginVertical: 5,
       color : 'white'
     },
     input: {
-        height: 40,
-        borderColor: 'white',
+        height: 45,
+        backgroundColor:'#d9d9d97a',
         borderWidth: 1,
         marginBottom: 10,
         padding: 10,

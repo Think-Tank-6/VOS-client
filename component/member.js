@@ -99,35 +99,99 @@ function Member({ route, navigation }) {
   return (
     <ImageBackground source={require('../assets/img/background.png')} style={styles.wrapper} resizeMode="cover">
       <View style={styles.container}>
-        <TouchableOpacity onPress={selectImage}>
+        <View style={styles.photoWrap}>
+
+        <View style={styles.photo}>
           <Image
             source={profileImage || require('../assets/img/image.png')}
-            style={styles.profileImage}
           />
+        </View>
+        <View style={styles.photoBtn}>
+
+        <TouchableOpacity onPress={selectImage}>
           <Text style={styles.buttonText}>파일 선택</Text>
         </TouchableOpacity>
-        <Text style={styles.infoText}>이메일: {userInfo.user_id}</Text>
-        <Text style={styles.infoText}>이름: {userInfo.name}</Text>
-        <Text style={styles.infoText}>전화번호: {userInfo.phone}</Text>
-        <Text style={styles.infoText}>생년월일: {userInfo.birth}</Text>
-        <Text style={styles.infoText}>크레딧: {userInfo.credit}</Text>
+        </View>
+        </View>
+        <View style={styles.contentsWrap}>
+
+          <View style={styles.headerWrap}>
+            <Text style={styles.HeaderText}>이메일:</Text>
+            <Text style={styles.HeaderText}>이름:</Text>
+            <Text style={styles.HeaderText}>전화번호:</Text>
+            <Text style={styles.HeaderText}>생년월일:</Text>
+            <Text style={styles.HeaderText}>크레딧:</Text>
+          </View>
+          <View style={styles.TextWrap}>
+              <Text style={styles.infoText}>{userInfo.user_id}</Text>
+              <Text style={styles.infoText}>{userInfo.name}</Text>
+              <Text style={styles.infoText}>{userInfo.phone}</Text>
+              <Text style={styles.infoText}>{userInfo.birth}</Text>
+              <Text style={styles.infoText}>{userInfo.credit}</Text>
+          </View>
+        </View>
+
+
       </View>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  photoBtn:{
+    borderRadius:5,
+    backgroundColor:'#d9d9d97a',
+    marginTop:10,
+    padding:7
+
+  },
+  photo:{
+    borderRadius:10,
+    backgroundColor:'#d9d9d97a'
+  },
+  photoWrap:{
+    display: 'flex',
+    flexDirection:'column',
+    alignItems:'center',
+    marginTop:50
+  },
+  headerWrap:{
+   justifyContent:'space-around'
+    
+  },
+  HeaderText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  TextWrap: {
+    justifyContent:'space-around',
+    width:'60%',
+
+  },
+  infoText: {
+    color: 'white',
+    fontSize: 16,
+   
+  },
+  contentsWrap: {
+    display:'flex',
+    flexDirection:'row',
+    justifyContent:'space-around',
+    height:'45%',
+    width:'80%',
+  },
   wrapper: {
     flex: 1,
   },
   safeArea: {
     flex: 1,
   },
+  
   container: {
-    flex: 1,
+    display:'flex',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingVertical: 50, // 상하 간격을 추가
+    height:'85%',
   },
   title: {
     fontSize: 30,
@@ -138,11 +202,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     // 여기에 프로필 이미지 스타일을 추가
   },
-  infoText: {
-    color: 'white',
-    fontSize: 18,
-    marginVertical: 5, // 텍스트 간의 상하 간격을 조정
-  },
+ 
   addButtonContainer: {
     height: 50, // 버튼의 높이
     backgroundColor: '#007AFF', // 버튼의 배경색
@@ -161,8 +221,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
+    
+   
   },
   titleImage: {
     width: '80%', // 이미지의 가로 크기를 조정합니다.
