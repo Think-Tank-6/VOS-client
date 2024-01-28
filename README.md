@@ -356,8 +356,6 @@ vos-client/
 
 → 한국어 지원 및 음성 복원 성능을 고려하여 **xtts-v2** 선정
 
-# ↘️ Voice of the star 실행
-
 
 # ↘️ Voice of the star 실행
 
